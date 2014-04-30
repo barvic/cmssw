@@ -69,7 +69,7 @@
 #include <cstdio>
 
 CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet & pset) :
-  numOfEvents(0)
+    numOfEvents(0)
 {
 
   // Tracked
@@ -100,7 +100,7 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet & pset) :
 
 
 
-  if(instantiateDQM)
+  if (instantiateDQM)
     {
       monitor = edm::Service<CSCMonitorInterface>().operator->();
     }
@@ -203,7 +203,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
       cscFEDids.push_back(id);
     }
 
-  for (unsigned int i=0; i<=cscFEDids.size(); i++)   // loop over all CSC FEDs (DCCs and DDUs)
+  for (unsigned int i=0; i<cscFEDids.size(); i++)   // loop over all CSC FEDs (DCCs and DDUs)
     {
       unsigned int id = cscFEDids[i];
       bool isDDU_FED = ((id >= FEDNumbering::MINCSCDDUFEDID) && (id <= FEDNumbering::MAXCSCDDUFEDID))?true:false;
@@ -225,15 +225,15 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
             {
               // CSCDCCExaminer examiner;
               examiner = new CSCDCCExaminer();
-              if( examinerMask&0x40000 ) examiner->crcCFEB(1);
-              if( examinerMask&0x8000  ) examiner->crcTMB (1);
-              if( examinerMask&0x0400  ) examiner->crcALCT(1);
+              if ( examinerMask&0x40000 ) examiner->crcCFEB(1);
+              if ( examinerMask&0x8000  ) examiner->crcTMB (1);
+              if ( examinerMask&0x0400  ) examiner->crcALCT(1);
               examiner->setMask(examinerMask);
 
               /// If we have DCC or only DDU FED by checking FED ID set examiner to uswe DCC or DDU mode
               if ( isDDU_FED )
                 {
-                  examiner->modeDDU(true);
+                  if (examiner != NULL) examiner->modeDDU(true);
                 }
 
               const short unsigned int *data = (short unsigned int *)fedData.data();
@@ -250,7 +250,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                       */
 
               int res = examiner->check(data,long(fedData.size()/2));
-              if( res < 0 )
+              if ( res < 0 )
                 {
                   goodEvent=false;
                 }
@@ -271,16 +271,16 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                 // formatStatusProduct->insertDigi(CSCDetId(1,1,1,1,1), CSCDCCFormatStatusDigi(id,examiner,dccBinCheckMask));
                 formatStatusProduct->insertDigi(CSCDetId(1,1,1,1,1),
                                                 CSCDCCFormatStatusDigi(id,dccBinCheckMask,
-                                                    examiner->getMask(),
-                                                    examiner->errors(),
-                                                    examiner->errorsDetailedDDU(),
-                                                    examiner->errorsDetailed(),
-                                                    examiner->payloadDetailed(),
-                                                    examiner->statusDetailed()));
+                                                                       examiner->getMask(),
+                                                                       examiner->errors(),
+                                                                       examiner->errorsDetailedDDU(),
+                                                                       examiner->errorsDetailed(),
+                                                                       examiner->payloadDetailed(),
+                                                                       examiner->statusDetailed()));
             }
 
           /// Visualization of raw data
-          if(visualFEDInspect || formatedEventDump)
+          if (visualFEDInspect || formatedEventDump)
             {
               if (!goodEvent || formatedEventDump)
                 {
@@ -299,13 +299,13 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
               if (!useSelectiveUnpacking) ptrExaminer = NULL;
 
 
-	      
+
               std::vector<CSCDDUEventData> fed_Data;
               std::vector<CSCDDUEventData>* ptr_fedData = &fed_Data;
-	
-	      /// set default detid to that for E=+z, S=1, R=1, C=1, L=1
-	      CSCDetId layer(1, 1, 1, 1, 1);
-	   
+
+              /// set default detid to that for E=+z, S=1, R=1, C=1, L=1
+              CSCDetId layer(1, 1, 1, 1, 1);
+
               if (isDDU_FED) // Use new DDU FED readout mode
                 {
 
@@ -324,11 +324,12 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
 
                   //std::cout << " DCC Size [UNPK] " << dccData.sizeInWords() << std::endl;
 
-                  if(instantiateDQM) monitor->process(examiner, &dccData);
+                  if (instantiateDQM) monitor->process(examiner, &dccData);
 
                   ///get a reference to dduData
                   // const std::vector<CSCDDUEventData> & dduData = dccData.dduData();
-                  ptr_fedData = &(dccData.dduData());
+                  // ptr_fedData = &(dccData.dduData());
+                  fed_Data = dccData.dduData();
 
 
                   if (unpackStatusDigis)
@@ -358,7 +359,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                   if (dduData[iDDU].trailer().errorstat()&errorMask)
                     {
                       LogTrace("CSCDCCUnpacker|CSCRawToDigi") << "FED ID" << id << " DDU# " << iDDU << " has serious error - no digis unpacked! " <<
-                                                              std::hex << dduData[iDDU].trailer().errorstat();
+                      std::hex << dduData[iDDU].trailer().errorstat();
                       continue; // to next iteration of DDU loop
                     }
 
@@ -393,7 +394,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                         {
                           LogTrace ("CSCDCCUnpacker|CSCRawToDigi") << " detID input out of range!!! ";
                           LogTrace ("CSCDCCUnpacker|CSCRawToDigi")
-                              << " skipping chamber vme= " << vmecrate << " dmb= " << dmb;
+                          << " skipping chamber vme= " << vmecrate << " dmb= " << dmb;
                           continue; // to next iteration of iCSC loop
                         }
 
@@ -411,7 +412,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                           else
                             {
                               LogTrace ("CSCDCCUnpacker|CSCRawToDigi") <<
-                                  "not storing ALCT digis; alct is bad or not present";
+                              "not storing ALCT digis; alct is bad or not present";
                             }
                         }
                       else
@@ -424,12 +425,12 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                         {
                           std::vector <CSCALCTDigi>  alctDigis =
                             cscData[iCSC].alctHeader()->ALCTDigis();
-                          if(SuppressZeroLCT)
+                          if (SuppressZeroLCT)
                             {
                               std::vector<CSCALCTDigi> alctDigis_0;
                               for (int unsigned i=0; i<alctDigis.size(); ++i)
                                 {
-                                  if(alctDigis[i].isValid())
+                                  if (alctDigis[i].isValid())
                                     alctDigis_0.push_back(alctDigis[i]);
                                 }
                               alctProduct->move(std::make_pair(alctDigis_0.begin(), alctDigis_0.end()),layer);
@@ -452,7 +453,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                           else
                             {
                               LogTrace ("CSCDCCUnpacker|CSCRawToDigi") <<
-                                  "one of TMB checks failed! not storing TMB digis ";
+                              "one of TMB checks failed! not storing TMB digis ";
                             }
                         }
                       else
@@ -465,12 +466,12 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                         {
                           std::vector <CSCCorrelatedLCTDigi>  correlatedlctDigis =
                             cscData[iCSC].tmbHeader()->CorrelatedLCTDigis(layer.rawId());
-                          if(SuppressZeroLCT)
+                          if (SuppressZeroLCT)
                             {
                               std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis_0;
                               for (int unsigned i=0; i<correlatedlctDigis.size(); ++i)
                                 {
-                                  if(correlatedlctDigis[i].isValid())
+                                  if (correlatedlctDigis[i].isValid())
                                     correlatedlctDigis_0.push_back(correlatedlctDigis[i]);
                                 }
                               corrlctProduct->move(std::make_pair(correlatedlctDigis_0.begin(),
@@ -482,12 +483,12 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
 
                           std::vector <CSCCLCTDigi>  clctDigis =
                             cscData[iCSC].tmbHeader()->CLCTDigis(layer.rawId());
-                          if(SuppressZeroLCT)
+                          if (SuppressZeroLCT)
                             {
                               std::vector<CSCCLCTDigi> clctDigis_0;
                               for (int unsigned i=0; i<clctDigis.size(); ++i)
                                 {
-                                  if(clctDigis[i].isValid())
+                                  if (clctDigis[i].isValid())
                                     clctDigis_0.push_back(clctDigis[i]);
                                 }
                               clctProduct->move(std::make_pair(clctDigis_0.begin(), clctDigis_0.end()),layer);
@@ -553,8 +554,13 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                                   stripProduct->move(std::make_pair(stripDigis.begin(),
                                                                     stripDigis.end()),layer);
                                 }
+                            }
 
-                              if (goodTMB)
+
+                          if (goodTMB && (cscData[iCSC].tmbHeader() != NULL))
+                            {
+                              int nCFEBs = cscData[iCSC].tmbHeader()->NCFEBs();
+                              for ( icfeb = 0; icfeb < nCFEBs; ++icfeb )
                                 {
                                   std::vector <CSCComparatorDigi>  comparatorDigis =
                                     cscData[iCSC].clctData()->comparatorDigis(layer.rawId(), icfeb);
@@ -572,7 +578,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
           else
             {
               LogTrace("CSCDCCUnpacker|CSCRawToDigi") <<
-                                                      "ERROR! Examiner rejected FED #" << id;
+              "ERROR! Examiner rejected FED #" << id;
               if (examiner)
                 {
                   for (int i=0; i<examiner->nERRORS; ++i)
@@ -583,9 +589,9 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
                   if (debug)
                     {
                       LogTrace("CSCDCCUnpacker|CSCRawToDigi")
-                          << " Examiner errors:0x" << std::hex << examiner->errors()
-                          << " & 0x" << examinerMask
-                          << " = " << (examiner->errors()&examinerMask);
+                      << " Examiner errors:0x" << std::hex << examiner->errors()
+                      << " & 0x" << examinerMask
+                      << " = " << (examiner->errors()&examinerMask);
                     }
                 }
 
@@ -616,7 +622,7 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
       e.put(alctStatusProduct,    "MuonCSCALCTStatusDigi");
     }
   if (printEventNumber) LogTrace("CSCDCCUnpacker|CSCRawToDigi")
-        <<"[CSCDCCUnpacker]: " << numOfEvents << " events processed ";
+    <<"[CSCDCCUnpacker]: " << numOfEvents << " events processed ";
 }
 
 
@@ -629,7 +635,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << std::endl << std::endl << std::endl;
   std::cout << "Run: "<< run << " Event: " << event << std::endl;
   std::cout << std::endl << std::endl;
-  if(formatedEventDump)
+  if (formatedEventDump)
     std::cout << "FED-" << id << "  " << "(scroll down to see summary)" << std::endl;
   else
     std::cout << "Problem seems in FED-" << id << "  " << "(scroll down to see summary)" << std::endl;
@@ -806,7 +812,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   for (int i=0; i < hl; i++)
     {
       ++word_numbering;
-      for(int j=-1; j<4; j++)
+      for (int j=-1; j<4; j++)
         {
 
           sprintf(tempbuf_short,"%04x%04x%04x%04x",buf[i+4*(j-1)+3],buf[i+4*(j-1)+2],buf[i+4*(j-1)+1],buf[i+4*(j-1)]);
@@ -893,7 +899,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
       ddu_h1_12_13=(buf[i]>>8);
       for (int kk=0; kk<36; kk++)
         {
-          if(((buf[i+3]&0xF000)==0x5000)&&(ddu_h1_12_13==ddu_id[kk])&&ddu_h2_h1)
+          if (((buf[i+3]&0xF000)==0x5000)&&(ddu_h1_12_13==ddu_id[kk])&&ddu_h2_h1)
             {
               ddu_h1_coll.push_back(word_numbering);
               ddu_h1_n_coll.push_back(ddu_id[kk]);
@@ -916,9 +922,9 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
 
       // Looking for DCC Header 1
       dcc_h1_id=(((buf[i+1]<<12)&0xF000)>>4)+(buf[i]>>8);
-      for(int dcci=0; dcci<16; dcci++)
+      for (int dcci=0; dcci<16; dcci++)
         {
-          if((dcc_id[dcci]==dcc_h1_id)&&(((buf[i+3]&0xF000)==0x5000)&&(!ddu_h1_check)))
+          if ((dcc_id[dcci]==dcc_h1_id)&&(((buf[i+3]&0xF000)==0x5000)&&(!ddu_h1_check)))
             {
               sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s%i %s",word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],
                       sign1,dcc_common,dcc_h1_id,dcc_header1);
@@ -930,21 +936,21 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       // Looking for DCC Header 2 and trailers
-      if(((word_numbering-1)==dcc_h1_check)&&((buf[i+3]&0xFF00)==0xD900))
+      if (((word_numbering-1)==dcc_h1_check)&&((buf[i+3]&0xFF00)==0xD900))
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s",word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],
                   sign1,dcc_header2);
           std::cout << tempbuf1 << std::endl;
           w=0;
         }
-      else if((word_numbering==word_lines-1)&&(tempbuf_short[0]==dcc_trail1_bit[0]))
+      else if ((word_numbering==word_lines-1)&&(tempbuf_short[0]==dcc_trail1_bit[0]))
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s",word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],
                   sign1,dcc_trail1);
           std::cout << tempbuf1 << std::endl;
           w=0;
         }
-      else if((word_numbering==word_lines)&&(tempbuf_short[0]==dcc_trail2_bit[0]))
+      else if ((word_numbering==word_lines)&&(tempbuf_short[0]==dcc_trail2_bit[0]))
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s",word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],
                   sign1,dcc_trail2);
@@ -953,10 +959,10 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       // DDU Header 2
-      else if(ddu_h2_check[1])
+      else if (ddu_h2_check[1])
         {
           ddu_inst_i = ddu_h1_n_coll.size(); //ddu_inst_n=ddu_h1_n_coll[0];
-          if(ddu_inst_i>0)
+          if (ddu_inst_i>0)
             {
               ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
             }
@@ -970,10 +976,10 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       // DDU Header 3 (either between DDU Header 2 DMB Header or DDU Header 2 DDU Trailer1)
-      else if((ddu_h2_check[0]&&dmb_h1_check[2])||(ddu_h2_check[0]&&ddu_tr1_check[2]))
+      else if ((ddu_h2_check[0]&&dmb_h1_check[2])||(ddu_h2_check[0]&&ddu_tr1_check[2]))
         {
           ddu_inst_i = ddu_h1_n_coll.size();
-          if(ddu_inst_i>0)
+          if (ddu_inst_i>0)
             {
               ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
             }
@@ -987,14 +993,14 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
 
       // DMB Header 1,2
 
-      else if(dmb_h1_check[1])
+      else if (dmb_h1_check[1])
         {
           dmb_inst_crate=0;
           dmb_inst_slot=0;
           dmb_inst_l1a=0;
           dmb_inst_l1a=((buf[i]&0x0FFF)+((buf[i+1]&0xFFF)<<12));
           dmb_l1a_coll.push_back(dmb_inst_l1a);
-          if(dmb_h2_check[2])
+          if (dmb_h2_check[2])
             {
               dmb_inst_crate=((buf[i+4+1]>>4)&0xFF);
               dmb_inst_slot=(buf[i+4+1]&0xF);
@@ -1011,12 +1017,12 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           ddu_h2_found=1;
         }
 
-      else if(dmb_h2_check[1])
+      else if (dmb_h2_check[1])
         {
           dmb_inst_crate=((buf[i+1]>>4)&0xFF);
           dmb_inst_slot=(buf[i+1]&0xF);
           dmb_h2_coll.push_back(word_numbering);
-          if(dmb_h1_check[0])
+          if (dmb_h1_check[0])
             dmb_inst_l1a=((buf[i-4]&0x0FFF)+((buf[i-4+1]&0xFFF)<<12));
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s %s%s%s %i %s %i %s %i",
                   word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],
@@ -1029,10 +1035,10 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
 
       //DDU Trailer 1
 
-      else if(ddu_tr1_check[1])
+      else if (ddu_tr1_check[1])
         {
           ddu_inst_i = ddu_h1_n_coll.size();
-          if(ddu_inst_i>0)
+          if (ddu_inst_i>0)
             {
               ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
             }
@@ -1045,7 +1051,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       ///ALCT Header 1,2
-      else if(alct_h1_check[1])
+      else if (alct_h1_check[1])
         {
           alct_start=word_numbering;
           alct_inst_l1a=(buf[i+2]&0x0FFF);
@@ -1059,7 +1065,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           alct_inst_l1a=0;
         }
 
-      else if((alct_h1_check[0])&&(alct_h2_check[2]))
+      else if ((alct_h1_check[0])&&(alct_h2_check[2]))
         {
           alct_inst_bxn=(buf[i]&0x0FFF);
           alct_bxn_coll.push_back(alct_inst_bxn);
@@ -1073,10 +1079,10 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       //ALCT Trailer 1
-      else if(alct_tr1_check[1])
+      else if (alct_tr1_check[1])
         {
           alct_stop=word_numbering;
-          if((alct_start!=0)&&(alct_stop!=0)&&(alct_stop>alct_start))
+          if ((alct_start!=0)&&(alct_stop!=0)&&(alct_stop>alct_start))
             {
               alct_inst_wcnt2=4*(alct_stop-alct_start+1);
               alct_wcnt2_coll.push_back(alct_inst_wcnt2);
@@ -1096,11 +1102,11 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       //DDU Trailer 3
-      else if((ddu_tr1_check[-1])&&(tempbuf_short[0]==ddu_trailer3_bit[0]))
+      else if ((ddu_tr1_check[-1])&&(tempbuf_short[0]==ddu_trailer3_bit[0]))
         {
           //&&(tempbuf_short[0]==ddu_trailer3_bit[0])){
           ddu_inst_i = ddu_h1_n_coll.size();
-          if(ddu_inst_i>0)
+          if (ddu_inst_i>0)
             {
               ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
             }
@@ -1112,11 +1118,11 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           w=0;
         }
       //DDU Trailer 2
-      else if((ddu_tr1_check[0])&&(tempbuf_short[0]!=ddu_trailer3_bit[0]))
+      else if ((ddu_tr1_check[0])&&(tempbuf_short[0]!=ddu_trailer3_bit[0]))
         {
           //&&(tempbuf_short[0]==ddu_trailer3_bit[0])){
           ddu_inst_i = ddu_h1_n_coll.size();
-          if(ddu_inst_i>0)
+          if (ddu_inst_i>0)
             {
               ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
             }
@@ -1129,7 +1135,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
         }
 
       //DMB Trailer 1,2
-      else if(dmb_tr1_check[1])
+      else if (dmb_tr1_check[1])
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s %s",
                   word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],sign1,dmb_common,dmb_tr1);
@@ -1139,7 +1145,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           cfeb_sample=0;
         }
 
-      else if(dmb_tr2_check[1])
+      else if (dmb_tr2_check[1])
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s %s",
                   word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],sign1,dmb_common,dmb_tr2);
@@ -1148,7 +1154,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           w=0;
         }
       // TMB
-      else if(tmb_h1_check[1])
+      else if (tmb_h1_check[1])
         {
           tmb_start=word_numbering;
           tmb_inst_l1a=(buf[i+2]&0x000F);
@@ -1161,10 +1167,10 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           w=0;
           tmb_inst_l1a=0;
         }
-      else if(tmb_tr1_check[1])
+      else if (tmb_tr1_check[1])
         {
           tmb_stop=word_numbering;
-          if((tmb_start!=0)&&(tmb_stop!=0)&&(tmb_stop>tmb_start))
+          if ((tmb_start!=0)&&(tmb_stop!=0)&&(tmb_stop>tmb_start))
             {
               tmb_inst_wcnt2=4*(tmb_stop-tmb_start+1);
               tmb_wcnt2_coll.push_back(tmb_inst_wcnt2);
@@ -1181,7 +1187,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           tmb_inst_wcnt2=0;
         }
       // CFEB
-      else if(cfeb_tr1_check[1])
+      else if (cfeb_tr1_check[1])
         {
           ++cfeb_sample;
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s %s%s %s %i",
@@ -1192,7 +1198,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           std::cout << tempbuf1 << std::endl;
           w=0;
         }
-      else if(cfeb_b_check[1])
+      else if (cfeb_b_check[1])
         {
           sprintf(tempbuf1,"%6i    %04x %04x %04x %04x%s%s %s",
                   word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i],sign1,cfeb_common,cfeb_b);
@@ -1202,7 +1208,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
 
       //ERRORS ddu_tr1_bad_check
 
-      else if(ddu_tr1_bad_check[1])
+      else if (ddu_tr1_bad_check[1])
         {
           ddu_inst_i = ddu_h1_n_coll.size();
           ddu_inst_n=ddu_h1_n_coll[ddu_inst_i-1];
@@ -1213,23 +1219,23 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
           w=0;
         }
 
-      else if(extraction&&(!ddu_h1_check)&&(!dcc_check))
+      else if (extraction&&(!ddu_h1_check)&&(!dcc_check))
         {
-          if(w<3)
+          if (w<3)
             {
               sprintf(tempbuf,"%6i    %04x %04x %04x %04x",
                       word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i]);
               std::cout << tempbuf << std::endl;
               w++;
             }
-          if(w==3)
+          if (w==3)
             {
               std::cout << "..................................................." << std::endl;
               w++;
             }
         }
 
-      else if((!ddu_h1_check)&&(!dcc_check))
+      else if ((!ddu_h1_check)&&(!dcc_check))
         {
           sprintf(tempbuf,"%6i    %04x %04x %04x %04x",word_numbering,buf[i+3],buf[i+2],buf[i+1],buf[i]);
           std::cout << tempbuf << std::endl;
@@ -1242,7 +1248,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   //char sign[30]; //WARNING 5_0_X
   std::cout <<"********************************************************************************" <<
             std::endl << std::endl;
-  if(fedshort)
+  if (fedshort)
     std::cout << "For complete output turn off VisualFEDShort in muonCSCDigis configuration file." << std::endl;
   std::cout <<"********************************************************************************" <<
             std::endl << std::endl;
@@ -1254,7 +1260,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << ddu_h1_coll.size() << " " << ddu_h1_n_coll.size() << " " << ddu_l1a_coll.size() <<
   " " << ddu_bxn_coll.size() << std::endl;
   */
-  for(unsigned int k=0; k<ddu_h1_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_h1_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s%i %s %i %s %i","Line: ",
@@ -1271,38 +1277,38 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << ddu_h2_coll.size() <<"  "<< ddu_common << "  "<<ddu_header2 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<ddu_h2_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_h2_coll.size(); ++k)
     std::cout << "Line:  " << ddu_h2_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << ddu_h3_coll.size() <<"  "<< ddu_common << "  "<<ddu_header3 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<ddu_h3_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_h3_coll.size(); ++k)
     std::cout << "Line:  " << ddu_h3_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << ddu_t1_coll.size() <<"  "<< ddu_common << "  "<<ddu_trail1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<ddu_t1_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_t1_coll.size(); ++k)
     std::cout << "Line:  " << ddu_t1_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << ddu_t2_coll.size() <<"  "<< ddu_common << "  "<<ddu_trail2 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<ddu_t2_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_t2_coll.size(); ++k)
     std::cout << "Line:  " << ddu_t2_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << ddu_t3_coll.size() <<"  "<< ddu_common << "  "<<ddu_trail3 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<ddu_t3_coll.size(); ++k)
+  for (unsigned int k=0; k<ddu_t3_coll.size(); ++k)
     std::cout << "Line:  " << ddu_t3_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << dmb_h1_coll.size() <<"  "<< dmb_common << "  "<<dmb_header1 << "  "<< "found" << std::endl;
 
-  for(unsigned int k=0; k<dmb_h1_coll.size(); ++k)
+  for (unsigned int k=0; k<dmb_h1_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s %s %i %s %i %s %i","Line: ",
@@ -1317,25 +1323,25 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << dmb_h2_coll.size() <<"  "<< dmb_common << "  "<<dmb_header2 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<dmb_h2_coll.size(); ++k)
+  for (unsigned int k=0; k<dmb_h2_coll.size(); ++k)
     std::cout << "Line:  " << dmb_h2_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << dmb_t1_coll.size() <<"  "<< dmb_common << "  "<<dmb_tr1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<dmb_t1_coll.size(); ++k)
+  for (unsigned int k=0; k<dmb_t1_coll.size(); ++k)
     std::cout << "Line:  " << dmb_t1_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << dmb_t2_coll.size() <<"  "<< dmb_common << "  "<<dmb_tr2 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<dmb_t2_coll.size(); ++k)
+  for (unsigned int k=0; k<dmb_t2_coll.size(); ++k)
     std::cout << "Line:  " << dmb_t2_coll[k] << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << alct_h1_coll.size() <<"  "<< alct_common << "  "<<alct_header1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<alct_h1_coll.size(); ++k)
+  for (unsigned int k=0; k<alct_h1_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s %s %i","Line: ",
@@ -1352,7 +1358,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << alct_h2_coll.size() <<"  "<< alct_common << "  "<<alct_header2 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<alct_h2_coll.size(); ++k)
+  for (unsigned int k=0; k<alct_h2_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s %s %i","Line: ",
@@ -1369,7 +1375,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << alct_t1_coll.size() <<"  "<< alct_common << "  "<<alct_tr1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<alct_t1_coll.size(); ++k)
+  for (unsigned int k=0; k<alct_t1_coll.size(); ++k)
     {
       /*
          sprintf(sign,"%s%6i%5s %s %s %i %s %i","Line: ",
@@ -1379,7 +1385,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
        */
       std::cout << "Line: " << "    " << alct_t1_coll[k] << " " << sign1 << " " << alct_common << " " <<
                 alct_common_wcnt1 << " " << alct_wcnt1_coll[k] << " " << alct_common_wcnt2 << " ";
-      if(alct_wcnt2_coll.size()>0)
+      if (alct_wcnt2_coll.size()>0)
         {
           std::cout << alct_wcnt2_coll[k] << std::endl;
         }
@@ -1393,7 +1399,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << tmb_h1_coll.size() <<"  "<< tmb_common << "  "<<tmb_header1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<tmb_h1_coll.size(); ++k)
+  for (unsigned int k=0; k<tmb_h1_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s %s %i","Line: ",
@@ -1409,7 +1415,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << tmb_t1_coll.size() <<"  "<< tmb_common << "  "<<tmb_tr1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<tmb_t1_coll.size(); ++k)
+  for (unsigned int k=0; k<tmb_t1_coll.size(); ++k)
     {
       /*
       sprintf(sign,"%s%6i%5s %s %s %i %s %i","Line: ",
@@ -1427,7 +1433,7 @@ void CSCDCCUnpacker::visual_raw(int hl,int id, int run, int event,bool fedshort,
   std::cout << "||||||||||||||||||||" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << cfeb_t1_coll.size() <<"  "<< cfeb_common << "  "<<cfeb_tr1 << "  "<< "found" << std::endl;
-  for(unsigned int k=0; k<cfeb_t1_coll.size(); ++k)
+  for (unsigned int k=0; k<cfeb_t1_coll.size(); ++k)
     std::cout << "Line:  " << cfeb_t1_coll[k] << std::endl;
   std::cout <<"********************************************************************************" << std::endl;
 
