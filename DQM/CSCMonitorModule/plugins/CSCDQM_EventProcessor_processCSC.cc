@@ -24,7 +24,7 @@ namespace cscdqm {
 
     template<typename T> inline CSCCFEBDataWord const * const
     timeSample( T const & data, int nCFEB,int nSample,int nLayer, int nStrip) { 
-         return data.cfebData(nCFEB)->timeSlice(nSample)->timeSample(nLayer,nStrip);
+         return data.cfebData(nCFEB)->timeSlice(nSample)->timeSample(nLayer,nStrip,data.cfebData(nCFEB)->isDCFEB());
     }
 
     template<typename T> inline CSCCFEBTimeSlice const * const
@@ -99,6 +99,8 @@ namespace cscdqm {
 
     bool L1A_out_of_sync = false;
 
+    int nCFEBs = 5;
+
     MonitorObject* mo = NULL;
 
     /**   DMB Found */
@@ -109,6 +111,9 @@ namespace cscdqm {
       LOG_ERROR << "Can not unpack DMB Header or/and Trailer";
       return;
     }
+
+    theFormatVersion = data.getFormatVersion();    
+
 
     /**  Unpacking of Chamber Identification number */
     unsigned int crateID = 0xFF;
@@ -250,12 +255,12 @@ namespace cscdqm {
     int dmb_cfeb_sync = 0;
 
     cfeb_dav = (int)dmbHeader->cfebAvailable();
-    for (int i = 0; i < 5; i++) cfeb_dav_num += (cfeb_dav >> i) & 0x1;
+    for (int i = 0; i < nCFEBs; i++) cfeb_dav_num += (cfeb_dav >> i) & 0x1;
     cfeb_movlp    = (int)dmbHeader->cfebMovlp();
     dmb_cfeb_sync = (int)dmbHeader->dmbCfebSync();
 
     if (getCSCHisto(h::CSC_DMB_CFEB_DAV, crateID, dmbID, mo)) {
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < nCFEBs; i++) {
         int cfeb_present = (cfeb_dav >> i) & 0x1;
         if (cfeb_present) {
           mo->Fill(i);
@@ -278,20 +283,20 @@ namespace cscdqm {
     /** if (getCSCHisto(h::CSC_DMB_CFEB_ACTIVE_VS_DAV, crateID, dmbID, mo)) mo->Fill(dmbHeader->cfebAvailable(),(int)((dmbTrailer->header_1a>>5)&0x1F)); //KK */
     /**  if (getCSCHisto(h::CSC_DMB_CFEB_ACTIVE_VS_DAV, crateID, dmbID, mo)) mo->Fill(dmbHeader->cfebAvailable(),dmbHeader->cfebActive()); //KK */
 
-    if (getCSCHisto(h::CSC_DMB_L1_PIPE, crateID, dmbID, mo)) mo->Fill(dmbTrailer->dmb_l1pipe);
+    if (getCSCHisto(h::CSC_DMB_L1_PIPE, crateID, dmbID, mo)) mo->Fill(dmbTrailer->dmb_l1pipe());
 
     /**  DMB input (7 in total) FIFO stuff goes here */
     if (getCSCHisto(h::CSC_DMB_FIFO_STATS, crateID, dmbID, mo)) {
-      if (dmbTrailer->tmb_empty == 1) mo->Fill(1.0, 0.0); //KK
-      if (dmbTrailer->tmb_half == 0) mo->Fill(1.0, 1.0);
-      if (dmbTrailer->tmb_full == 1) mo->Fill(1.0, 2.0); //KK
-      if (dmbTrailer->alct_empty == 1) mo->Fill(0.0, 0.0);
-      if (dmbTrailer->alct_half == 0) mo->Fill(0.0, 1.0);
-      if (dmbTrailer->alct_full == 1) mo->Fill(0.0, 2.0); //KK 0->1
-      for (int i = 0; i < 5; i++) {
-        if ((int)((dmbTrailer->cfeb_empty>>i)&0x1) == 1) mo->Fill(i + 2, 0.0);
-        if ((int)((dmbTrailer->cfeb_half>>i)&0x1) == 0) mo->Fill(i + 2, 1);
-        if ((int)((dmbTrailer->cfeb_full>>i)&0x1) == 1) {
+      if (dmbTrailer->tmb_empty() == 1) mo->Fill(1.0, 0.0); //KK
+      if (dmbTrailer->tmb_half() == 0) mo->Fill(1.0, 1.0);
+      if (dmbTrailer->tmb_full() == 1) mo->Fill(1.0, 2.0); //KK
+      if (dmbTrailer->alct_empty() == 1) mo->Fill(0.0, 0.0);
+      if (dmbTrailer->alct_half() == 0) mo->Fill(0.0, 1.0);
+      if (dmbTrailer->alct_full() == 1) mo->Fill(0.0, 2.0); //KK 0->1
+      for (int i = 0; i < nCFEBs; i++) {
+        if ((int)((dmbTrailer->cfeb_empty()>>i)&0x1) == 1) mo->Fill(i + 2, 0.0);
+        if ((int)((dmbTrailer->cfeb_half()>>i)&0x1) == 0) mo->Fill(i + 2, 1);
+        if ((int)((dmbTrailer->cfeb_full()>>i)&0x1) == 1) {
           mo->Fill(i + 2, 2);
         }
       }
@@ -300,19 +305,19 @@ namespace cscdqm {
 
     /**  DMB input timeout (total 15 bits) goes here */
     if (getCSCHisto(h::CSC_DMB_FEB_TIMEOUTS, crateID, dmbID, mo)) {
-      if ((dmbTrailer->tmb_timeout == 0) && (dmbTrailer->alct_timeout == 0) && (dmbTrailer->cfeb_starttimeout == 0) && (dmbTrailer->cfeb_endtimeout == 0)) {
+      if ((dmbTrailer->tmb_starttimeout() == 0) && (dmbTrailer->alct_starttimeout() == 0) && (dmbTrailer->cfeb_starttimeout() == 0) && (dmbTrailer->cfeb_endtimeout() == 0)) {
         mo->Fill(0.0);
       }else{
-        if (dmbTrailer->alct_timeout) mo->Fill(1);
-        if (dmbTrailer->tmb_timeout) mo->Fill(2);
-        if (dmbTrailer->alct_endtimeout) mo->Fill(8); // KK
-        if (dmbTrailer->tmb_endtimeout) mo->Fill(9);  // KK
+        if (dmbTrailer->alct_starttimeout()) mo->Fill(1);
+        if (dmbTrailer->tmb_starttimeout()) mo->Fill(2);
+        if (dmbTrailer->alct_endtimeout()) mo->Fill(8); // KK
+        if (dmbTrailer->tmb_endtimeout()) mo->Fill(9);  // KK
       }
-      for (int i = 0; i < 5; i++) {
-        if ((dmbTrailer->cfeb_starttimeout >> i) & 0x1) {
+      for (int i = 0; i < nCFEBs; i++) {
+        if ((dmbTrailer->cfeb_starttimeout() >> i) & 0x1) {
           mo->Fill(i + 3);
         }
-        if ((dmbTrailer->cfeb_endtimeout >> i) & 0x1) {
+        if ((dmbTrailer->cfeb_endtimeout() >> i) & 0x1) {
           mo->Fill(i + 10); // KK 8->10
         }
       }
@@ -323,7 +328,7 @@ namespace cscdqm {
     int alct_dav  = dmbHeader->nalct();
     int tmb_dav   = dmbHeader->nclct();
     int cfeb_dav2 = 0;
-    for (int i = 0; i < 5; i++) cfeb_dav2 = cfeb_dav2 + (int)((dmbHeader->cfebAvailable() >> i) & 0x1);
+    for (int i = 0; i < nCFEBs; i++) cfeb_dav2 = cfeb_dav2 + (int)((dmbHeader->cfebAvailable() >> i) & 0x1);
 
     /**       Fill Hisogram for FEB DAV Efficiency */
 
@@ -1095,7 +1100,8 @@ namespace cscdqm {
             }
         }
 
-        int N_CFEBs = 5;
+        // int N_CFEBs = 5;
+        int N_CFEBs=tmbHeader->NCFEBs();
 
         int NumberOfLayersWithHitsInCLCT = 0;
         int NumberOfHalfStripsWithHitsInCLCT = 0;
@@ -1242,16 +1248,16 @@ namespace cscdqm {
 
     /**  CFEB found */
     int NumberOfUnpackedCFEBs = 0;
-    const int N_CFEBs = 5, N_Samples = 16, N_Layers = 6, N_Strips = 16;
+    const int N_CFEBs = nCFEBs, N_Samples = 16, N_Layers = 6, N_Strips = 16, nStrips = nCFEBs * N_Strips;
     int ADC = 0, OutOffRange, Threshold = 30;
     /**  bool DebugCFEB = false; */
-//     CSCCFEBData * cfebData[5];
-//     CSCCFEBTimeSlice *  timeSlice[5][16];
-//     CSCCFEBDataWord * timeSample[5][16][6][16];
-    int Pedestal[5][6][16];
-    std::pair<int,int> CellPeak[5][6][16];
+//     CSCCFEBData * cfebData[N_CFEBs];
+//     CSCCFEBTimeSlice *  timeSlice[N_CFEBs][16];
+//     CSCCFEBDataWord * timeSample[N_CFEBs][16][6][16];
+    int Pedestal[N_CFEBs][6][16];
+    std::pair<int,int> CellPeak[N_CFEBs][6][16];
     memset(CellPeak, 0, sizeof(CellPeak));
-//     float PedestalError[5][6][16];
+//     float PedestalError[N_CFEBs][6][16];
 //     CSCCFEBSCAControllerWord scaControllerWord[5][16][6];
     bool CheckCFEB = true;
     /** --------------B */
@@ -1261,14 +1267,14 @@ namespace cscdqm {
     int  FreeCells, LCT_Pipe_Empty, LCT_Pipe_Full, LCT_Pipe_Count, L1_Pipe_Empty, L1_Pipe_Full, Buffer_Count;
     /** --------------E */
 
-    bool CheckThresholdStripInTheLayer[6][80];
+    bool CheckThresholdStripInTheLayer[6][nStrips];
     for(int i=0; i<6; i++) {
-      for(int j = 0; j < 80; j++) CheckThresholdStripInTheLayer[i][j] = true;
+      for(int j = 0; j < nStrips; j++) CheckThresholdStripInTheLayer[i][j] = true;
     }
 
-    bool CheckOutOffRangeStripInTheLayer[6][80];
+    bool CheckOutOffRangeStripInTheLayer[6][nStrips];
     for(int i=0; i<6; i++) {
-      for(int j=0; j<80; j++) CheckOutOffRangeStripInTheLayer[i][j] = true;
+      for(int j=0; j<nStrips; j++) CheckOutOffRangeStripInTheLayer[i][j] = true;
     }
 
     /** --------------B */
@@ -1475,7 +1481,7 @@ namespace cscdqm {
 
 
             for(int nStrip = 1; nStrip <= N_Strips; ++nStrip) {
-//               timeSample[nCFEB][nSample][nLayer - 1][nStrip - 1]=(data.cfebData(nCFEB)->timeSlice(nSample))->timeSample(nLayer,nStrip);
+//               timeSample[nCFEB][nSample][nLayer - 1][nStrip - 1]=(data.cfebData(nCFEB)->timeSlice(nSample))->timeSample(nLayer,nStrip,data.cfebData(nCFEB)->isDCFEB());
 	      ADC = (int) ((timeSample(data, nCFEB, nSample, nLayer, nStrip)->adcCounts) & 0xFFF);
               /**  LOG_DEBUG <<  " nStrip="<< dec << nStrip << " ADC=" << std::hex << ADC; */
               OutOffRange = (int) ((timeSample(data, nCFEB, nSample, nLayer, nStrip)->adcOverflow) & 0x1);

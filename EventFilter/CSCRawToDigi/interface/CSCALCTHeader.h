@@ -7,7 +7,9 @@
 #include <bitset>
 #include <vector>
 #include <iosfwd>
+#ifndef LOCAL_UNPACK
 #include <atomic>
+#endif
 #include "DataFormats/CSCDigi/interface/CSCALCTDigi.h"
 #include "DataFormats/CSCDigi/interface/CSCALCTStatusDigi.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCALCTHeader2006.h"
@@ -144,9 +146,14 @@ class CSCALCTHeader {
   //raw data also stored in this buffer
   //maximum header size is 116 words
   unsigned short int theOriginalBuffer[116];
-  
+ 
+#ifdef LOCAL_UNPACK
+ static bool debug;
+ static unsigned short int firmwareVersion;  
+#else 
   static std::atomic<bool> debug;
   static std::atomic<unsigned short int> firmwareVersion;
+#endif
 
   ///size of the 2007 header in words
   unsigned short int sizeInWords2007_, bxn0, bxn1;

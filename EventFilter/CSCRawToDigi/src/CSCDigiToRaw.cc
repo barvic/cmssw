@@ -109,7 +109,7 @@ CSCEventData & CSCDigiToRaw::findEventData(const CSCDetId & cscDetId)
     {
       // make an entry, telling it the correct chamberType
       int chamberType = chamberId.iChamberType();
-      chamberMapItr = theChamberDataMap.insert(pair<CSCDetId, CSCEventData>(chamberId, CSCEventData(chamberType))).first;
+      chamberMapItr = theChamberDataMap.insert(pair<CSCDetId, CSCEventData>(chamberId, CSCEventData(chamberType, theFormatVersion))).first;
     }
   CSCEventData & cscData = chamberMapItr->second;
   cscData.dmbHeader()->setCrateAddress(theElectronicsMap->crate(cscDetId), theElectronicsMap->dmb(cscDetId));
@@ -139,9 +139,16 @@ void CSCDigiToRaw::add(const CSCStripDigiCollection& stripDigis,
           {
             CSCStripDigi digi = *digiItr;
             int strip = digi.getStrip();
-            if ( me1a && zplus ) { digi.setStrip(17-strip); } // 1-16 -> 16-1
-            if ( me1b && !zplus) { digi.setStrip(65-strip);} // 1-64 -> 64-1
-            if ( me1a ) { strip = digi.getStrip(); digi.setStrip(strip+64);} // reset back 1-16 to 65-80 digi
+            if (theFormatVersion == 2013) {
+	      if ( me1a && zplus ) { digi.setStrip(49-strip); } // 1-48 -> 48-1
+              if ( me1b && !zplus) { digi.setStrip(65-strip);} // 1-64 -> 64-1
+              if ( me1a ) { strip = digi.getStrip(); digi.setStrip(strip+64);} // reset back 1-16 to 65-80 digi
+
+            } else {
+              if ( me1a && zplus ) { digi.setStrip(17-strip); } // 1-16 -> 16-1
+              if ( me1b && !zplus) { digi.setStrip(65-strip);} // 1-64 -> 64-1
+              if ( me1a ) { strip = digi.getStrip(); digi.setStrip(strip+64);} // reset back 1-16 to 65-80 digi
+            }
             cscData.add(digi, cscDetId.layer() );
           }
       }
@@ -244,9 +251,10 @@ void CSCDigiToRaw::createFedBuffers(const CSCStripDigiCollection& stripDigis,
                                     const CSCCorrelatedLCTDigiCollection& correlatedLCTDigis,
                                     FEDRawDataCollection& fed_buffers,
                                     const CSCChamberMap* mapping,
-                                    Event & e)
+                                    Event & e, uint16_t format_version)
 {
 
+   theFormatVersion = format_version;
   //bits of code from ORCA/Muon/METBFormatter - thanks, Rick:)!
   
   //get fed object from fed_buffers
@@ -294,7 +302,7 @@ void CSCDigiToRaw::createFedBuffers(const CSCStripDigiCollection& stripDigis,
         int dduSlot  = mapping->dduSlot(chamberItr->first);
         int dduInput = mapping->dduInput(chamberItr->first);
         int dmbId    = mapping->dmb(chamberItr->first);
-        dccMapItr->second.addChamber(chamberItr->second, dduId, dduSlot, dduInput, dmbId);
+        dccMapItr->second.addChamber(chamberItr->second, dduId, dduSlot, dduInput, dmbId, theFormatVersion);
       }
     }
   }

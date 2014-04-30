@@ -9,13 +9,17 @@ CSCDDUHeader::CSCDDUHeader()
 }
 
 
-CSCDDUHeader::CSCDDUHeader(unsigned bx, unsigned l1num, unsigned sourceId) 
-  : source_id_(sourceId), bxnum_(bx), lvl1num_(l1num)
+CSCDDUHeader::CSCDDUHeader(unsigned bx, unsigned l1num, unsigned sourceId, unsigned fmt_version) 
+  : format_version_(fmt_version&0xF)
+  , source_id_(sourceId)
+  , bxnum_(bx)
+  , lvl1num_(l1num)
 {
   bzero(this, sizeInWords()*2);
   source_id_ = sourceId;
   bxnum_ = bx;
   lvl1num_ = l1num;
+  format_version_ = fmt_version & 0xF;
   init();
 }
 

@@ -11,7 +11,7 @@ class CSCDDUHeader {
 
  public:
   CSCDDUHeader();
-  CSCDDUHeader(unsigned bx, unsigned l1num, unsigned sourceId);
+  CSCDDUHeader(unsigned bx, unsigned l1num, unsigned sourceId, unsigned fmt_version = 0x6);
   CSCDDUHeader(const CSCDDUStatusDigi & digi)
     {
       memcpy(this, digi.header(), sizeInWords()*2);

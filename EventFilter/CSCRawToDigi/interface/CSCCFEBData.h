@@ -14,9 +14,9 @@ class CSCCFEBStatusDigi;
 class CSCCFEBData {
  public:
  /// read from an existing data stream. 
-  CSCCFEBData(unsigned boardNumber, unsigned short * buf);
+  CSCCFEBData(unsigned boardNumber, unsigned short * buf, uint16_t theFormatVersion = 2005, bool fDCFEB = false);
   /// create, 
-  CSCCFEBData(unsigned boardNumber, bool sixteenSamples);
+  CSCCFEBData(unsigned boardNumber, bool sixteenSamples, uint16_t theFormatVersion = 2005, bool fDCFEB = false);
   
   unsigned nTimeSamples() const { return theNumberOfSamples;}
 
@@ -53,6 +53,8 @@ class CSCCFEBData {
 
   /// makes sure each time slice has a trailer
   bool check() const;
+
+  bool isDCFEB() const {return fDCFEB;}
   
  private:
   unsigned short theData[1600];
@@ -64,6 +66,8 @@ class CSCCFEBData {
   unsigned boardNumber_;
   unsigned theNumberOfSamples;
   std::vector<uint16_t> bWords;
+  uint16_t theFormatVersion;
+  bool fDCFEB;
 };
 
 #endif

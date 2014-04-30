@@ -190,8 +190,9 @@ int CSCTMBData::UnpackTMB(unsigned short *buf) {
   }
 
   int currentPosition = theTMBHeader.sizeInWords();
+  int theFirmwareVersion = theTMBHeader.FirmwareVersion();
 
-  theCLCTData = CSCCLCTData(theTMBHeader.NCFEBs(), theTMBHeader.NTBins(), buf+e0bLine+1);
+  theCLCTData = CSCCLCTData(theTMBHeader.NCFEBs(), theTMBHeader.NTBins(), buf+e0bLine+1, theFirmwareVersion);
 
   if(!theCLCTData.check())   {
     LogTrace("CSCTMBData|CSCRawToDigi") << "+++ CSCTMBData warning: Bad CLCT data";

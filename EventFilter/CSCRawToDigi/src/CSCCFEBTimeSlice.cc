@@ -31,12 +31,14 @@ CSCCFEBSCAControllerWord::CSCCFEBSCAControllerWord(unsigned short frame)
 }
 
 
-CSCCFEBDataWord * CSCCFEBTimeSlice::timeSample(int layer, int channel) const 
+CSCCFEBDataWord * CSCCFEBTimeSlice::timeSample(int layer, int channel, bool isDCFEB) const 
 {
   assert(layer >= 1 && layer <= 6);
   assert(channel >=1 && channel <= 16);
   int layerIndex = layerInverseGrayCode[layer-1];
+
   unsigned channelIndex = channelInverseGrayCode[channel-1];
+  if (isDCFEB) channelIndex = channel-1; //!!! New DCFEBs don't use gray coding for channels
   unsigned scaBin = channelIndex*6 + layerIndex;
   assert(scaBin < 96U); // scaBin >= 0, since scaBin is unsigned
   return timeSample(scaBin);

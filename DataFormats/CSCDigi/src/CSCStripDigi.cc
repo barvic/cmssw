@@ -5,7 +5,11 @@
  */
 #include "DataFormats/CSCDigi/interface/CSCStripDigi.h"
 #include <iostream>
+#ifdef LOCAL_UNPACK
+#include <stdint.h>
+#else
 #include <cstdint>
+#endif
 
 
 // Comparison

@@ -1193,10 +1193,8 @@ int32_t CSCDCCExaminer::check(const uint16_t* &buffer, int32_t length)
             {
               COUT<<"+";
             }
-#endif
           if( CFEB_SampleWordCount != 100 )
             {
-#ifdef LOCAL_UNPACK
               COUT<<"-";
 #endif
 
@@ -1345,7 +1343,7 @@ int32_t CSCDCCExaminer::check(const uint16_t* &buffer, int32_t length)
                   bCHAMB_STATUS[currentChamber] |= (buf_1[3]&0x0800)>>4;      /// ALCT Start Timeout
                   bCHAMB_STATUS[currentChamber] |= (buf_1[2]&0x0100);         /// TMB Start Timeout
                   bCHAMB_STATUS[currentChamber] |= (buf_1[3]&0x01f0)<<5;      /// CFEB 1-5 Start Timeout
-                  bCHAMB_STATUS[currentChamber] |= (buf_1[3]&0x0600)<<16;     /// CFEB 6-7 Start Timeout
+                  bCHAMB_STATUS[currentChamber] |= (buf_1[3]&0x0600)<<15;     /// CFEB 6-7 Start Timeout
                   bCHAMB_STATUS[currentChamber] |= (buf_1[0]&0x0800)<<3;      /// ALCT End Timeout
                   bCHAMB_STATUS[currentChamber] |= (buf_1[1]&0x001f)<<16;     /// CFEB 1-5 End Timeout
                   bCHAMB_STATUS[currentChamber] |= (buf_1[1]&0x0060)<<21;     /// CFEB 6-7 End Timeout

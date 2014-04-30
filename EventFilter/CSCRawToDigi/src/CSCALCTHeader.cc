@@ -4,10 +4,20 @@
 #include "EventFilter/CSCRawToDigi/src/bitset_append.h"
 #include "EventFilter/CSCRawToDigi/src/cscPackerCompare.h"
 #include <iomanip>
+
+#ifdef LOCAL_UNPACK
+
+bool CSCALCTHeader::debug=false;
+short unsigned int CSCALCTHeader::firmwareVersion=2007;
+
+#else
+
 #include <atomic>
 
 std::atomic<bool> CSCALCTHeader::debug{false};
 std::atomic<short unsigned int> CSCALCTHeader::firmwareVersion{2007}; 
+
+#endif
 
 CSCALCTHeader::CSCALCTHeader(int chamberType)
 : header2006(chamberType),

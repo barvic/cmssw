@@ -9,11 +9,16 @@
 
 #include <iostream>
 #include <cstdio>
-#include <atomic>
 
 #include "EventFilter/CSCRawToDigi/src/bitset_append.h"
 
+#ifdef LOCAL_UNPACK
+bool CSCDDUEventData::debug = false;
+#else
+#include <atomic>
 std::atomic<bool> CSCDDUEventData::debug{false};
+#endif
+
 uint32_t CSCDDUEventData::errMask = 0xFFFFFFFF;
 
 
@@ -176,8 +181,21 @@ void CSCDDUEventData::unpack_data(uint16_t *buf, CSCDCCExaminer* examiner)
   buf += theDDUHeader.sizeInWords();
   
 
-
-
+  // if (theDDUHeader.format_version() >= 0x6)
+  if (theDDUHeader.format_version() == 0x7) /// New Data Format 2013
+   {
+     theFormatVersion = 2013;
+   }
+  else if (theDDUHeader.format_version() <= 0x6) /// Older Data format before 2013
+   {
+     theFormatVersion = 2005;
+   }
+  else // Add handling for any other format version
+   {
+     theFormatVersion = 2013;
+   }
+   
+  // std::cout << "Format Version: " << theFormatVersion << std::endl;
   //std::cout << "sandrik dduID =" << theDDUHeader.source_id() << std::endl; 
   //int i=-1;
 
@@ -218,7 +236,7 @@ void CSCDDUEventData::unpack_data(uint16_t *buf, CSCDCCExaminer* examiner)
 	    continue;
           } 
 	
-	  theData.push_back(CSCEventData(pos));
+	  theData.push_back(CSCEventData(pos, theFormatVersion));
         }
       }
 

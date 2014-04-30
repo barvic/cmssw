@@ -11,25 +11,27 @@
 
 bool CSCEventData::debug = false;
 
-CSCEventData::CSCEventData(int chamberType) : 
-  theDMBHeader(), 
+CSCEventData::CSCEventData(int chamberType, uint16_t format_version) : 
+  theDMBHeader(format_version), 
   theALCTHeader(0), 
   theAnodeData(0),
   theALCTTrailer(0),
   theTMBData(0),
-  theDMBTrailer(),
+  theDMBTrailer(format_version),
   theChamberType(chamberType),
   alctZSErecovered(0),
-  zseEnable(0)
+  zseEnable(0),
+  theFormatVersion(format_version)
 {
   
-  for(unsigned i = 0; i < 5; ++i) {
+  for(unsigned i = 0; i < MAX_CFEB; ++i) {
     theCFEBData[i] = 0;
   }
 }
 
 
-CSCEventData::CSCEventData(unsigned short * buf){
+CSCEventData::CSCEventData(unsigned short * buf, uint16_t format_version): theFormatVersion(format_version){
+  theFormatVersion = format_version;
   unpack_data(buf);
 }
 
@@ -46,7 +48,7 @@ void CSCEventData::unpack_data(unsigned short * buf)
     }
     }
    
-  theDMBHeader = CSCDMBHeader(pos);
+  theDMBHeader = CSCDMBHeader(pos, theFormatVersion);
   if(!(theDMBHeader.check())) {
     LogTrace ("CSCEventData|CSCRawToDigi")  << "Bad DMB Header??? " << " first four words: ";
     for(int i = 0; i < 4; ++i){
@@ -215,15 +217,16 @@ void CSCEventData::unpack_data(unsigned short * buf)
       && (*(i+pos+4) & 0xF000) == 0xE000 && (*(i+pos+5) & 0xF000) == 0xE000
       && (*(i+pos+6) & 0xF000) == 0xE000 && (*(i+pos+7) & 0xF000) == 0xE000;
     if (dmbTrailerReached) {
-      theDMBTrailer = *( (CSCDMBTrailer *) (pos+i) );
+      // theDMBTrailer = *( (CSCDMBTrailer *) (pos+i) );
+      theDMBTrailer = CSCDMBTrailer(pos+i, theFormatVersion);
       break;
     }
   }
   if (dmbTrailerReached) {
-    for(int icfeb = 0; icfeb < 5; ++icfeb)  {
+    for(int icfeb = 0; icfeb < MAX_CFEB; ++icfeb)  {
       theCFEBData[icfeb] = 0;
       int cfeb_available = theDMBHeader.cfebAvailable(icfeb);
-      unsigned int cfebTimeout = theDMBTrailer.cfeb_starttimeout | theDMBTrailer.cfeb_endtimeout;    
+      unsigned int cfebTimeout = theDMBTrailer.cfeb_starttimeout() | theDMBTrailer.cfeb_endtimeout();    
       //cfeb_available cannot be trusted - need additional verification!
       if ( cfeb_available==1 )   {
 	if ((cfebTimeout >> icfeb) & 1) {
@@ -231,7 +234,12 @@ void CSCEventData::unpack_data(unsigned short * buf)
 	} else {
 	  //dataPresent|=(0x1>>icfeb);
 	  // Fill CFEB data and convert it into cathode digis
-	  theCFEBData[icfeb] = new CSCCFEBData(icfeb, pos);
+	  
+          // Check if we have here DCFEB  using DMB format version field (new ME11 with DCFEBs - 0x2, other chamber types 0x1)
+	  bool isDCFEB = false;
+          if (theDMBHeader.format_version() == 2) isDCFEB = true;
+
+	  theCFEBData[icfeb] = new CSCCFEBData(icfeb, pos, theFormatVersion, isDCFEB);
 	  pos += theCFEBData[icfeb]->sizeInWords();
 	}
       }
@@ -242,6 +250,8 @@ void CSCEventData::unpack_data(unsigned short * buf)
   else {
     LogTrace ("CSCEventData|CSCRawToDigi") << "Critical Error: DMB Trailer was not found!!! ";
   }
+
+  // std::cout << "CSC format: " << theFormatVersion << " " << getFormatVersion() << std::endl;
 }
 
 bool CSCEventData::isALCT(const short unsigned int * buf) {
@@ -277,7 +287,7 @@ void CSCEventData::init() {
   theAnodeData = 0;
   theALCTTrailer = 0;
   theTMBData = 0;
-  for(int icfeb = 0; icfeb < 5; ++icfeb) {
+  for(int icfeb = 0; icfeb < MAX_CFEB; ++icfeb) {
     theCFEBData[icfeb] = 0;
   }
   alctZSErecovered=0;
@@ -287,6 +297,7 @@ void CSCEventData::init() {
 
 void CSCEventData::copy(const CSCEventData & data) {
   init();
+  theFormatVersion = data.theFormatVersion;
   theDMBHeader  = data.theDMBHeader;
   theDMBTrailer = data.theDMBTrailer;
   if(data.theALCTHeader != NULL)
@@ -297,13 +308,14 @@ void CSCEventData::copy(const CSCEventData & data) {
     theALCTTrailer = new CSCALCTTrailer(*(data.theALCTTrailer));
   if(data.theTMBData != NULL) 
     theTMBData     = new CSCTMBData(*(data.theTMBData));
-  for(int icfeb = 0; icfeb < 5; ++icfeb) {
+  for(int icfeb = 0; icfeb < MAX_CFEB; ++icfeb) {
     theCFEBData[icfeb] = 0;
     if(data.theCFEBData[icfeb] != NULL) 
       theCFEBData[icfeb] = new CSCCFEBData(*(data.theCFEBData[icfeb]));
   }   
   size_  = data.size_;
   theChamberType = data.theChamberType;
+  
   
 }
 
@@ -316,7 +328,7 @@ void CSCEventData::destroy() {
   delete theAnodeData;
   delete theALCTTrailer;
   delete theTMBData;
-  for(int icfeb = 0; icfeb < 5; ++icfeb) {
+  for(int icfeb = 0; icfeb < MAX_CFEB; ++icfeb) {
     delete theCFEBData[icfeb];
   }
 /*
@@ -329,7 +341,7 @@ void CSCEventData::destroy() {
 
 std::vector<CSCStripDigi> CSCEventData::stripDigis(const CSCDetId & idlayer) const {
   std::vector<CSCStripDigi> result;
-  for(unsigned icfeb = 0; icfeb < 5; ++icfeb){
+  for(unsigned icfeb = 0; icfeb < MAX_CFEB; ++icfeb){
     std::vector<CSCStripDigi> newDigis = stripDigis(idlayer, icfeb);
     result.insert(result.end(), newDigis.begin(), newDigis.end());
   }
@@ -458,7 +470,7 @@ void CSCEventData::add(const CSCStripDigi & digi, int layer) {
   bool sixteenSamples = false;
   if (digi.getADCCounts().size()==16) sixteenSamples = true;  
   if(theCFEBData[cfeb] == 0)    {
-    theCFEBData[cfeb] = new CSCCFEBData(cfeb, sixteenSamples);
+    theCFEBData[cfeb] = new CSCCFEBData(cfeb, sixteenSamples, theFormatVersion);
     theDMBHeader.addCFEB(cfeb);
   }
   theCFEBData[cfeb]->add(digi, layer);
@@ -530,7 +542,7 @@ boost::dynamic_bitset<> CSCEventData::pack() {
     result  = bitset_utilities::append(result, theTMBData->pack());
   }
 
-  for(int icfeb = 0;  icfeb < 5;  ++icfeb)  {
+  for(int icfeb = 0;  icfeb < MAX_CFEB;  ++icfeb)  {
     if(theCFEBData[icfeb] != NULL){
       boost::dynamic_bitset<> cfebData = bitset_utilities::ushortToBitset(theCFEBData[icfeb]->sizeInWords()*16,
 									  theCFEBData[icfeb]->data());

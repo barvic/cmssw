@@ -3,7 +3,11 @@
 #include "DataFormats/CSCDigi/interface/CSCComparatorDigi.h"
 #include <vector>
 #include <cassert>
+
+#ifndef LOCAL_UNPACK
 #include <atomic>
+#endif
+
 
 struct CSCCLCTDataWord {
   CSCCLCTDataWord(unsigned cfeb, unsigned tbin, unsigned data)
@@ -23,8 +27,8 @@ class CSCCLCTData {
 public:
 
   explicit CSCCLCTData(const CSCTMBHeader * tmbHeader);
-  CSCCLCTData(int ncfebs, int ntbins);
-  CSCCLCTData(int ncfebs, int ntbins, const unsigned short *e0bbuf);
+  CSCCLCTData(int ncfebs, int ntbins, int firmware_version = 2007);
+  CSCCLCTData(int ncfebs, int ntbins, const unsigned short *e0bbuf, int firmware_version = 2007);
 
   /** turns on/off debug flag for this class */
   static void setDebug(const bool value) {debug = value;};
@@ -77,11 +81,17 @@ public:
   // helper for constructors
   void zero();
 
+#ifdef LOCAL_UNPACK
+  static bool debug;
+#else
   static std::atomic<bool> debug;
+#endif
+
   int ncfebs_;
   int ntbins_;
   int size_;
   unsigned short theData[5*6*32];
+  int theFirmwareVersion;
 };
 
 #endif

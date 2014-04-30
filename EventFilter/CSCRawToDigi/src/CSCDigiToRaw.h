@@ -35,7 +35,7 @@ public:
                         const CSCCorrelatedLCTDigiCollection& correlatedLCTDigis,
 			FEDRawDataCollection& fed_buffers,
 		        const CSCChamberMap* theMapping, 
-			edm::Event & e);
+			edm::Event & e, uint16_t theFormatVersion = 2005);
 
 private:
   void beginEvent(const CSCChamberMap* electronicsMap);
@@ -62,6 +62,7 @@ private:
   int clctWindowMax_;
   int preTriggerWindowMin_;
   int preTriggerWindowMax_;
+  uint16_t theFormatVersion;
 
 };
 

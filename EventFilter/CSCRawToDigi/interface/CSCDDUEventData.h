@@ -59,8 +59,11 @@ public:
   /// returns packed event data
   boost::dynamic_bitset<> pack();
 
-  
+#ifdef LOCAL_UNPACK
+  static bool debug;
+#else
   static std::atomic<bool> debug;
+#endif
   static unsigned int errMask;
 
   /// a good test routine would be to unpack data, then pack it again.
@@ -74,6 +77,7 @@ protected:
   CSCDCCTrailer theDCCTrailer;
   uint16_t theDDUTrailer0;
   int theSizeInWords;
+  uint16_t theFormatVersion;
 };
 
 #endif
