@@ -10,7 +10,10 @@
  *  \author  G. Mila - INFN Torino
  *   
  */
+
+
 #include "FWCore/Framework/interface/Frameworkfwd.h"
+#include <FWCore/Framework/interface/EDAnalyzer.h>
 #include "DataFormats/Common/interface/Handle.h"
 #include <FWCore/Framework/interface/ESHandle.h>
 #include <FWCore/Framework/interface/Event.h>
@@ -20,8 +23,6 @@
 
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
-#include "DQMServices/Core/interface/DQMEDHarvester.h"
-
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Framework/interface/Run.h"
 
@@ -33,7 +34,7 @@
 
 
 
-class MuonRecoTest: public DQMEDHarvester{
+class MuonRecoTest: public edm::EDAnalyzer{
 
 public:
 
@@ -41,12 +42,26 @@ public:
   MuonRecoTest(const edm::ParameterSet& ps);
   
   /// Destructor
-  virtual ~MuonRecoTest() {};
+  virtual ~MuonRecoTest();
 
 protected:
 
+  /// BeginJob
+  void beginJob(void);
+
+  /// Analyze
+  void analyze(const edm::Event& e, const edm::EventSetup& c);
+
   /// Endjob
-  void dqmEndJob(DQMStore::IBooker &, DQMStore::IGetter &) override; //performed in the endJob
+  void endJob();
+
+  void beginRun(edm::Run const& run, edm::EventSetup const& eSetup);
+  void beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::EventSetup const& context) ;
+
+  /// DQM Client Diagnostic
+  void endLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::EventSetup const& c);
+  void endRun(edm::Run const& run, edm::EventSetup const& eSetup);
+
 
 private:
 
@@ -57,10 +72,11 @@ private:
   int run;
   // Switch for verbosity
   std::string metname;
+
+  DQMStore* theDbe;
   edm::ParameterSet parameters;
 
    //histo binning parameters
-  std::string EfficiencyCriterionName;
   int etaBin;
   double etaMin;
   double etaMax;

@@ -11,6 +11,7 @@
 #include <memory>
 #include <fstream>
 #include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -19,14 +20,13 @@
 
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
-#include "DQMServices/Core/interface/DQMEDAnalyzer.h"
 
 #include "RecoMuon/TrackingTools/interface/MuonServiceProxy.h"
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h" 
 
-class MuonRecoAnalyzer : public thread_unsafe::DQMEDAnalyzer {
+class MuonRecoAnalyzer : public edm::EDAnalyzer {
  public:
 
   /// Constructor
@@ -36,15 +36,19 @@ class MuonRecoAnalyzer : public thread_unsafe::DQMEDAnalyzer {
   virtual ~MuonRecoAnalyzer();
 
   /// Inizialize parameters for histo binning
+  void beginJob();
+  void beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup);
+
+  /// Get the analysis
   void analyze(const edm::Event&, const edm::EventSetup&);
-  void bookHistograms(DQMStore::IBooker &, edm::Run const &, edm::EventSetup const &) override;
- 
+  
   //calculate residual & pull:
   void GetRes( reco::TrackRef t1, reco::TrackRef t2, std::string par, float &res, float &pull);
 
  private:
   // ----------member data ---------------------------
-    MuonServiceProxy *theService;
+  DQMStore *theDbe;
+  MuonServiceProxy *theService;
   edm::ParameterSet parameters;
   
   edm::EDGetTokenT<reco::MuonCollection> theMuonCollectionLabel_;

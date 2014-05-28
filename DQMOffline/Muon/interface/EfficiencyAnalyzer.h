@@ -13,13 +13,13 @@
 #include <fstream>
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
-#include "DQMServices/Core/interface/DQMEDAnalyzer.h"
 #include "RecoMuon/TrackingTools/interface/MuonServiceProxy.h"
 
 #include "DataFormats/MuonReco/interface/Muon.h"
@@ -34,7 +34,7 @@
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
 
-class EfficiencyAnalyzer : public thread_unsafe::DQMEDAnalyzer {
+class EfficiencyAnalyzer : public edm::EDAnalyzer {
   
  public:
   /* Constructor */ 
@@ -44,11 +44,16 @@ class EfficiencyAnalyzer : public thread_unsafe::DQMEDAnalyzer {
   virtual ~EfficiencyAnalyzer() ;
 
   /* Operations */ 
+  void beginJob();
+  void beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup);
+
+
   void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
-  void bookHistograms(DQMStore::IBooker &, edm::Run const &, edm::EventSetup const &) override;
+  //  void endJob ();
 
  private:
   edm::ParameterSet parameters;
+  DQMStore* theDbe;
   MuonServiceProxy *theService;
     
   // Switch for verbosity
