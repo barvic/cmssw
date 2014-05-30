@@ -4,8 +4,18 @@
 
 #include "EventFilter/CSCRawToDigi/interface/CSCALCTTrailer.h"
 
+
+#ifdef LOCAL_UNPACK
+
 bool CSCALCTTrailer::debug=false;
 short unsigned int CSCALCTTrailer::firmwareVersion=2006; 
+
+#else
+
+std::atomic<bool> CSCALCTTrailer::debug{false};
+std::atomic<short unsigned int> CSCALCTTrailer::firmwareVersion{2006}; 
+
+#endif
 
 CSCALCTTrailer2006::CSCALCTTrailer2006() {
   bzero(this,  sizeInWords()*2); ///size of the trailer
