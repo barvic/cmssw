@@ -27,6 +27,20 @@ public:
   virtual uint16_t syncErrorCLCT() const = 0;
   virtual uint16_t syncErrorMPC0() const = 0;
   virtual uint16_t syncErrorMPC1() const = 0;
+
+  /// == Run 3 CSC-GEM Trigger Format
+  virtual uint16_t CLCT0_ComparatorCode() const = 0;
+  virtual uint16_t CLCT1_ComparatorCode() const = 0;
+  virtual uint16_t CLCT0_xky() const = 0;
+  virtual uint16_t CLCT1_xky() const = 0;
+  virtual uint16_t HMT_nhits() const = 0;
+  virtual uint16_t GEM_enabled_fibers() const = 0;
+  virtual uint16_t GEM_fifo_tbins() const = 0;
+  virtual uint16_t GEM_fifo_pretrig() const = 0;
+  virtual uint16_t GEM_zero_suppress() const = 0;
+  virtual uint16_t GEM_sync_dataword() const = 0;
+  virtual uint16_t GEM_timing_dataword() const = 0;
+
   uint16_t sizeInBytes() const { return sizeInWords() * 2; }
   virtual uint16_t NTBins() const = 0;
   virtual uint16_t NCFEBs() const = 0;

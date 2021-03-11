@@ -5,6 +5,7 @@
 #include "EventFilter/CSCRawToDigi/interface/CSCTMBHeader2007.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCTMBHeader2007_rev0x50c3.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCTMBHeader2013.h"
+#include "EventFilter/CSCRawToDigi/interface/CSCTMBHeader2020.h"
 #include "DataFormats/CSCDigi/interface/CSCCLCTDigi.h"
 #include "DataFormats/CSCDigi/interface/CSCCorrelatedLCTDigi.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -19,7 +20,11 @@ std::atomic<bool> CSCTMBHeader::debug{false};
 
 CSCTMBHeader::CSCTMBHeader(int firmwareVersion, int firmwareRevision)
     : theHeaderFormat(), theFirmwareVersion(firmwareVersion) {
-  if (firmwareVersion == 2013) {
+  if (firmwareVersion == 2020) {
+    if ((firmwareRevision < 0x4000) && (firmwareRevision > 0x0)) { /* New (O)TMB firmware revision format */
+      theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2020());
+    }
+  } else if (firmwareVersion == 2013) {
     theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2013());
   } else if (firmwareVersion == 2006) {
     theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2006());
@@ -33,7 +38,17 @@ CSCTMBHeader::CSCTMBHeader(int firmwareVersion, int firmwareRevision)
       // if (firmwareRevision >= 0x7a76) // First OTMB firmware revision with 2013 format
       /* Revisions > 0x6000 - OTMB firmwares, < 0x42D5 - new TMB revisions in 2016 */
       if ((firmwareRevision >= 0x6000) || (firmwareRevision < 0x42D5)) {
-        theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2013());
+        bool isGEMfirmware = false;
+        /* There are OTMB2013 firmware versions exist, which reports firmwareRevision code = 0x0 */
+        if ((firmwareRevision < 0x4000) && (firmwareRevision > 0x0)) { /* New (O)TMB firmware revision format */
+          if (((firmwareRevision >> 9) & 0xF) == 0x2)
+            isGEMfirmware = true;
+          if (isGEMfirmware) {
+            theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2020());
+          } else {
+            theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2013());
+          }
+        }
       } else {
         theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2007_rev0x50c3());
       }
@@ -64,7 +79,20 @@ CSCTMBHeader::CSCTMBHeader(const unsigned short *buf) : theHeaderFormat() {
       /* Revisions > 0x6000 - OTMB firmwares, < 0x42D5 - new TMB revisions in 2016 */
       if ((theHeaderFormat->firmwareRevision() >= 0x6000) || (theHeaderFormat->firmwareRevision() < 0x42D5)) {
         theFirmwareVersion = 2013;
-        theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2013(buf));
+        bool isGEMfirmware = false;
+        int firmwareRevision = theHeaderFormat->firmwareRevision();
+        /* There are OTMB2013 firmware versions exist, which reports firmwareRevision code = 0x0 */
+        if ((firmwareRevision < 0x4000) && (firmwareRevision > 0x0)) { /* New (O)TMB firmware revision format */
+          theFirmwareVersion = 2020;
+          if (((firmwareRevision >> 11) & 0xF) == 0x2)
+            isGEMfirmware = true;
+        }
+
+        if ((theFirmwareVersion == 2020) || (isGEMfirmware)) {
+          theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2020(buf));
+        } else {
+          theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2013(buf));
+        }
       } else {
         theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2007_rev0x50c3(buf));
       }
@@ -148,6 +176,14 @@ CSCTMBHeader2013 CSCTMBHeader::tmbHeader2013() const {
   CSCTMBHeader2013 *result = dynamic_cast<CSCTMBHeader2013 *>(theHeaderFormat.get());
   if (result == nullptr) {
     throw cms::Exception("Could not get 2013 TMB header format");
+  }
+  return *result;
+}
+
+CSCTMBHeader2020 CSCTMBHeader::tmbHeader2020() const {
+  CSCTMBHeader2020 *result = dynamic_cast<CSCTMBHeader2020 *>(theHeaderFormat.get());
+  if (result == 0) {
+    throw cms::Exception("Could not get 2020 TMB header format");
   }
   return *result;
 }

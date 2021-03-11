@@ -3599,7 +3599,7 @@
                 <SetOption>textcolz</SetOption>
                 <SetOptStat>e</SetOptStat>
                 <SetRightMargin>0.1</SetRightMargin>
-		<SetYLabels>1='ALCT_FIFO_FULL'|2='TMB_FIFO_FULL'|3='CFEB1_FIFO_FULL'|4='CFEB2_FIFO_FULL'|5='CFEB3_FIFO_FULL'|6='CFEB4_FIFO_FULL'|7='CFEB5_FIFO_FULL'|8='ALCT_START_TIMEOUT'|9='TMB_START_TIMEOUT|10='CFEB1_START_TIMEOUT'|11='CFEB2_START_TIMEOUT'|12='CFEB3_START_TIMEOUT'|13='CFEB4_START_TIMEOUT'|14='CFEB5_START_TIMEOUT'|15='ALCT_END_TIMEOUT'|16='TMB_END_TIMEOUT'|17='CFEB1_END_TIMEOUT'|18='CFEB2_END_TIMEOUT'|19='CFEB3_END_TIMEOUT'|20='CFEB4_END_TIMEOUT'|21='CFEB5_END_TIMEOUT'|22='CFEB Active-DAV mismatch'|23='B-words found'|24='CFEB6_FIFO_FULL'|25='CFEB7_FIFO_FULL'|26='CFEB6_START_TIMEOUT'|27='CFEB7_START_TIMEOUT'|28='CFEB6_END_TIMEOUT'|29='CFEB6_END_TIMEOUT'|</SetYLabels>
+		<SetYLabels>1='ALCT_FIFO_FULL'|2='TMB_FIFO_FULL'|3='CFEB1_FIFO_FULL'|4='CFEB2_FIFO_FULL'|5='CFEB3_FIFO_FULL'|6='CFEB4_FIFO_FULL'|7='CFEB5_FIFO_FULL'|8='ALCT_START_TIMEOUT'|9='TMB_START_TIMEOUT|10='CFEB1_START_TIMEOUT'|11='CFEB2_START_TIMEOUT'|12='CFEB3_START_TIMEOUT'|13='CFEB4_START_TIMEOUT'|14='CFEB5_START_TIMEOUT'|15='ALCT_END_TIMEOUT'|16='TMB_END_TIMEOUT'|17='CFEB1_END_TIMEOUT'|18='CFEB2_END_TIMEOUT'|19='CFEB3_END_TIMEOUT'|20='CFEB4_END_TIMEOUT'|21='CFEB5_END_TIMEOUT'|22='CFEB Active-DAV mismatch'|23='B-words found'|24='CFEB6_FIFO_FULL'|25='CFEB7_FIFO_FULL'|26='CFEB6_START_TIMEOUT'|27='CFEB7_START_TIMEOUT'|28='CFEB6_END_TIMEOUT'|29='CFEB7_END_TIMEOUT'|</SetYLabels>
                 <Title>Data Flow Problems Table</Title>
                 <Type>h2</Type>
                 <XBins>1</XBins>
@@ -3646,7 +3646,7 @@
                 <SetOptStat>e</SetOptStat>
 		<SetRightMargin>0.1</SetRightMargin>
                 <SetXLabels>1=' '|</SetXLabels>
-                <SetYLabels>1='ALCT_FIFO_FULL'|2='TMB_FIFO_FULL'|3='CFEB1_FIFO_FULL'|4='CFEB2_FIFO_FULL'|5='CFEB3_FIFO_FULL'|6='CFEB4_FIFO_FULL'|7='CFEB5_FIFO_FULL'|8='ALCT_START_TIMEOUT'|9='TMB_START_TIMEOUT|10='CFEB1_START_TIMEOUT'|11='CFEB2_START_TIMEOUT'|12='CFEB3_START_TIMEOUT'|13='CFEB4_START_TIMEOUT'|14='CFEB5_START_TIMEOUT'|15='ALCT_END_TIMEOUT'|16='TMB_END_TIMEOUT'|17='CFEB1_END_TIMEOUT'|18='CFEB2_END_TIMEOUT'|19='CFEB3_END_TIMEOUT'|20='CFEB4_END_TIMEOUT'|21='CFEB5_END_TIMEOUT'|22='CFEB Active-DAV mismatch'|23='B-words found'|24='CFEB6_FIFO_FULL'|25='CFEB7_FIFO_FULL'|26='CFEB6_START_TIMEOUT'|27='CFEB7_START_TIMEOUT'|28='CFEB6_END_TIMEOUT'|29='CFEB6_END_TIMEOUT'|</SetYLabels>
+                <SetYLabels>1='ALCT_FIFO_FULL'|2='TMB_FIFO_FULL'|3='CFEB1_FIFO_FULL'|4='CFEB2_FIFO_FULL'|5='CFEB3_FIFO_FULL'|6='CFEB4_FIFO_FULL'|7='CFEB5_FIFO_FULL'|8='ALCT_START_TIMEOUT'|9='TMB_START_TIMEOUT|10='CFEB1_START_TIMEOUT'|11='CFEB2_START_TIMEOUT'|12='CFEB3_START_TIMEOUT'|13='CFEB4_START_TIMEOUT'|14='CFEB5_START_TIMEOUT'|15='ALCT_END_TIMEOUT'|16='TMB_END_TIMEOUT'|17='CFEB1_END_TIMEOUT'|18='CFEB2_END_TIMEOUT'|19='CFEB3_END_TIMEOUT'|20='CFEB4_END_TIMEOUT'|21='CFEB5_END_TIMEOUT'|22='CFEB Active-DAV mismatch'|23='B-words found'|24='CFEB6_FIFO_FULL'|25='CFEB7_FIFO_FULL'|26='CFEB6_START_TIMEOUT'|27='CFEB7_START_TIMEOUT'|28='CFEB6_END_TIMEOUT'|29='CFEB7_END_TIMEOUT'|</SetYLabels>
                 <Title>Data Flow Problems</Title>
                 <Type>h2</Type>
                 <XBins>1</XBins>
@@ -3674,5 +3674,120 @@
 		<YMin>1</YMin>
                 <Name from="1" to="5">Chamber_Event_Display_No%d</Name>
 	</Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>Correlated LCT%d Hits Distribution</Title>
+                <Type>h2</Type>
+                <XBins>224</XBins>
+                <XMax>224</XMax>
+                <XMin>0</XMin>
+                <XTitle>Key HalfStrips</XTitle>
+                <YBins>48</YBins>
+                <YMax>48</YMax>
+                <YMin>0</YMin>
+                <YTitle>Key Anode WG</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_Hits_Distribution</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <Title>Correlated LCT%d Key Anode WG</Title>
+                <Type>h1</Type>
+                <XBins>112</XBins>
+                <XMax>112</XMax>
+                <XMin>0</XMin>
+                <XTitle>Key Anode WG</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_KeyWG</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <Title>Correlated LCT%d Key Half Strip</Title>
+                <Type>h1</Type>
+                <XBins>224</XBins>
+                <XMax>224</XMax>
+                <XMin>0</XMin>
+                <XTitle>Key Half Strip</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_KeyHalfStrip</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <Title>Correlated LCT%d Key Quarter Strip</Title>
+                <Type>h1</Type>
+                <XBins>448</XBins>
+                <XMax>448</XMax>
+                <XMin>0</XMin>
+                <XTitle>Key Quart Strip</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_KeyQuartStrip</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <Title>Correlated LCT%d Key Eights Strip</Title>
+                <Type>h1</Type>
+                <XBins>896</XBins>
+                <XMax>896</XMax>
+                <XMin>0</XMin>
+                <XTitle>Key Eights Strip</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_KeyEightStrip</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLabelSizeX>0.025</SetLabelSizeX>
+                <SetMinimum>0</SetMinimum>
+                <SetNdivisionsX>32</SetNdivisionsX>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>eomr</SetOptStat>
+                <Title>Run3 5-bit CLCT Pattern ID Distribution</Title>
+                <Type>h1</Type>
+                <XBins>32</XBins>
+                <XMax>32</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 5-bit CLCT Pattern ID</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>Corr_LCT_Run3_PatternID</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLogy>1</SetLogy>
+                <SetNdivisionsX>16</SetNdivisionsX>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>eomr</SetOptStat>
+                <Title>Run3 Correlated LCT HMT Counter</Title>
+                <Type>h1</Type>
+                <XBins>16</XBins>
+                <XMax>16</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 HMT Counter</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>Corr_LCT_Run3_HMT_Distribution</Name>
+        </Histogram>
+     
+
 
 </Booking>
