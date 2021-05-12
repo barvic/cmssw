@@ -26,6 +26,19 @@ struct CSCTMBHeader2013 : public CSCVTMBHeaderFormat {
   uint16_t syncErrorMPC0() const override { return bits.MPC_Muon0_SyncErr_; }
   uint16_t syncErrorMPC1() const override { return bits.MPC_Muon1_SyncErr_; }
 
+  /// == Run 3 CSC-GEM Trigger Format
+  virtual uint16_t CLCT0_ComparatorCode() const override { return 0; }
+  virtual uint16_t CLCT1_ComparatorCode() const override { return 0; }
+  virtual uint16_t CLCT0_xky() const override { return 0; }
+  virtual uint16_t CLCT1_xky() const override { return 0; }
+  virtual uint16_t HMT_nhits() const override { return 0; }
+  virtual uint16_t GEM_enabled_fibers() const override { return 0; }
+  virtual uint16_t GEM_fifo_tbins() const override { return 0; }
+  virtual uint16_t GEM_fifo_pretrig() const override { return 0; }
+  virtual uint16_t GEM_zero_suppress() const override { return 0; }
+  virtual uint16_t GEM_sync_dataword() const override { return 0; }
+  virtual uint16_t GEM_timing_dataword() const override { return 0; }
+
   ///returns CLCT digis
   std::vector<CSCCLCTDigi> CLCTDigis(uint32_t idlayer) override;
   ///returns CorrelatedLCT digis

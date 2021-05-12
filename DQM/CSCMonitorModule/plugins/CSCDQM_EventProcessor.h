@@ -47,6 +47,7 @@
 #include "EventFilter/CSCRawToDigi/interface/CSCDDUEventData.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCCFEBTimeSlice.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCCFEBData.h"
+#include "EventFilter/CSCRawToDigi/interface/CSCTMBHeader2020.h"
 
 #include "DataFormats/CSCDigi/interface/CSCDCCFormatStatusDigi.h"
 #include "DataFormats/CSCDigi/interface/CSCDCCFormatStatusDigiCollection.h"

@@ -134,7 +134,7 @@ namespace cscdqm {
     }
 
     // Check if ME11 with PostLS1 readout (7 DCFEBs)
-    if ((cscType == 8 || cscType == 9) && theFormatVersion == 2013)
+    if ((cscType == 8 || cscType == 9) && theFormatVersion >= 2013)
       nCFEBs = 7;
 
     // Check if in standby!
@@ -863,14 +863,220 @@ namespace cscdqm {
         CSCTMBTrailer* tmbTrailer = tmbData->tmbTrailer();
 
         if (tmbHeader && tmbTrailer) {
+          /*
+          std::cout << " === TMB Firmware Version: " << tmbHeader->FirmwareVersion()
+                        << ",  Revision: 0x" << std::hex << tmbHeader->FirmwareRevision() << std::dec  << std::endl;
+*/
+          if (tmbHeader->FirmwareVersion() == 2020) {
+            // tmbHeader->tmbHeader2020().print(std::cout);
+            uint16_t gem_sync_status = tmbHeader->GEM_sync_dataword();
+            if (getCSCHisto(h::CSC_GEM_SYNC_STATUS, crateID, dmbID, mo)) {
+              for (int i = 8; i < 15; i++) {
+                if ((gem_sync_status >> i) & 0x1)
+                  mo->Fill(i - 8);
+              }
+            }
+
+            if (getCSCHisto(h::CSC_GEM_COPAD_MATCH, crateID, dmbID, mo)) {
+              mo->Fill(gem_sync_status & 0xFF);
+            }
+
+            if (getCSCHisto(h::CSC_CLCT_RUN3_HMT_NHITS, crateID, dmbID, mo)) {
+              mo->Fill(tmbHeader->HMT_nhits());
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCT_RUN3_PATTERN_ID, crateID, dmbID, mo)) {
+              mo->Fill((tmbHeader->tmbHeader2020()).Run3_CLCT_patternID());
+            }
+          }
+          /*
+              std::cout << "OTMB dump: " << "CLCT0_ComparatorCode: 0x" << std::hex << tmbHeader->CLCT0_ComparatorCode()
+                        << ", CLCT0_xky: 0x" << std::hex << tmbHeader->CLCT0_xky()
+                        << ", CLCT1_ComparatorCode: 0x" << std::hex << tmbHeader->CLCT1_ComparatorCode()
+                        << ", CLCT1_xky: 0x" << std::hex << tmbHeader->CLCT1_xky()
+                        << ", GEM_sync_dataword: 0x" << std::hex << tmbHeader->GEM_sync_dataword()
+                        << ", GEM_timing_dataword: 0x" << std::hex << tmbHeader->GEM_timing_dataword()
+                        << ",\n   HMT_nhits: 0x" << std::hex << tmbHeader->HMT_nhits()
+                        << ", GEM_enabled_fibers: 0x" << std::hex << tmbHeader->GEM_enabled_fibers()
+                        << ", GEM_fifo_tbins: " << std::dec << tmbHeader->GEM_fifo_tbins()
+                        << ", GEM_fifo_pretrig: " << std::dec << tmbHeader->GEM_fifo_pretrig()
+                        << ", GEM_zero_suppression: " << std::dec << tmbHeader->GEM_zero_suppress() << std::endl;
+*/
           CSCComparatorData* comparatorData = data.comparatorData();
 
           std::vector<CSCCLCTDigi> clctsDatasTmp = tmbHeader->CLCTDigis(cid.rawId());
           std::vector<CSCCLCTDigi> clctsDatas;
 
           for (uint32_t lct = 0; lct < clctsDatasTmp.size(); lct++) {
-            if (clctsDatasTmp[lct].isValid())
+            if (clctsDatasTmp[lct].isValid()) {
               clctsDatas.push_back(clctsDatasTmp[lct]);
+              if ((lct == 0) && getCSCHisto(h::CSC_CLCTXX_KEY_STRIP_TYPE, crateID, dmbID, lct, mo))
+                mo->Fill(tmbHeader->CLCT0_xky());
+              if ((lct == 1) && getCSCHisto(h::CSC_CLCTXX_KEY_STRIP_TYPE, crateID, dmbID, lct, mo))
+                mo->Fill(tmbHeader->CLCT1_xky());
+            }
+          }
+
+          for (uint32_t lct = 0; lct < clctsDatas.size(); lct++) {
+            /*
+                  std::cout << "CLCT Digis dump: "
+                            << "CLCT" << lct << " isRun3:" << clctsDatasTmp[lct].isRun3()
+                            << ", isValid: " << clctsDatasTmp[lct].isValid()
+                            << ", getCFEB: " << clctsDatasTmp[lct].getCFEB()
+                            << ", getKeyStrip: " << clctsDatasTmp[lct].getKeyStrip()
+                            << ", getFractionalStrip: " <<  clctsDatasTmp[lct].getFractionalStrip()
+                            << ", getQuartStrip: " << clctsDatasTmp[lct].getQuartStrip()
+                            << ", getEightStrip: " << clctsDatasTmp[lct].getEightStrip()
+                            << ",\n    getCompCode: 0x" << std::hex << clctsDatasTmp[lct].getCompCode()
+                            << ", getQuality: " << clctsDatasTmp[lct].getQuality() << std::dec
+                            << ", getPattern: " << clctsDatasTmp[lct].getPattern() << std::dec
+                            << ", getBend: " << clctsDatasTmp[lct].getBend() << std::dec
+                            << ", getSlope: " << clctsDatasTmp[lct].getSlope() << std::dec
+                            << ", getFractionalSlope: " <<  clctsDatasTmp[lct].getFractionalSlope()
+                            << ", getBX: " << clctsDatasTmp[lct].getBX()
+                            << ", getRun3Pattern: 0x" << std::hex << clctsDatasTmp[lct].getRun3Pattern()
+                            << std::dec << std::endl;
+*/
+            if (getCSCHisto(h::CSC_CLCTXX_COMPARATOR_CODE, crateID, dmbID, lct, mo)) {
+              mo->Fill(clctsDatas[lct].getCompCode());
+            }
+          }
+
+          std::vector<CSCCorrelatedLCTDigi> corr_lctsDatasTmp = tmbHeader->CorrelatedLCTDigis(cid.rawId());
+          std::vector<CSCCorrelatedLCTDigi> corr_lctsDatas;
+
+          for (uint32_t lct = 0; lct < corr_lctsDatasTmp.size(); lct++) {
+            if (corr_lctsDatasTmp[lct].isValid()) {
+              corr_lctsDatas.push_back(corr_lctsDatasTmp[lct]);
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCT_CLCT_COMBINATION, crateID, dmbID, mo)) {
+              mo->Fill(clctsDatasTmp[lct].isValid() * 2 + lct, corr_lctsDatasTmp[lct].isValid() * 2 + lct);
+            }
+          }
+
+          if (clctsDatasTmp[0].isValid() && corr_lctsDatasTmp[0].isValid() &&
+              getCSCHisto(h::CSC_CORR_LCT0_VS_CLCT0_KEY_STRIP, crateID, dmbID, mo)) {
+            mo->Fill(clctsDatasTmp[0].getKeyStrip(), corr_lctsDatasTmp[0].getStrip());
+          }
+
+          if (clctsDatasTmp[1].isValid() && corr_lctsDatasTmp[1].isValid() &&
+              getCSCHisto(h::CSC_CORR_LCT1_VS_CLCT1_KEY_STRIP, crateID, dmbID, mo)) {
+            mo->Fill(clctsDatasTmp[1].getKeyStrip(), corr_lctsDatasTmp[1].getStrip());
+          }
+
+          if (corr_lctsDatas.size() > 0) {
+            if (getCSCHisto(h::CSC_CORR_LCT0_VS_LCT1_RUN3_PATTERN, crateID, dmbID, mo)) {
+              mo->Fill(corr_lctsDatasTmp[0].getRun3Pattern(),
+                       (clctsDatasTmp[1].isValid()) ? corr_lctsDatasTmp[1].getRun3Pattern() : -1);
+            }
+          }
+
+          for (uint32_t lct = 0; lct < corr_lctsDatas.size(); lct++) {
+            /*
+                  std::cout << "CorrelatedLCT Digis dump: "
+                            << "CorrLCT" << lct << " isRun3:" << corr_lctsDatasTmp[lct].isRun3()
+                            << ", isValid: " << corr_lctsDatasTmp[lct].isValid()
+                            << ", getStrip: " << corr_lctsDatasTmp[lct].getStrip()
+                            << ", getKeyWG: " << corr_lctsDatasTmp[lct].getKeyWG()
+                            << ", getQuality: " << corr_lctsDatasTmp[lct].getQuality()
+                            << ", getFractionalStrip: " <<  corr_lctsDatasTmp[lct].getFractionalStrip()
+                            << ", getQuartStrip: " << corr_lctsDatasTmp[lct].getQuartStrip()
+                            << ", getEightStrip: " << corr_lctsDatasTmp[lct].getEightStrip()
+                            << ",\n getSlope: " << corr_lctsDatasTmp[lct].getSlope() << std::dec
+                            << ", getBend: " << corr_lctsDatasTmp[lct].getBend()
+                            << ", getBX: " << corr_lctsDatasTmp[lct].getBX()
+                            << ", getPattern: 0x" << std::hex << corr_lctsDatasTmp[lct].getPattern()
+                            << ", getRun3Pattern: 0x" << std::hex << corr_lctsDatasTmp[lct].getRun3Pattern()
+                            // << ", getRun3PatternID: " << std::dec << corr_lctsDatasTmp[lct].getRun3PatternID()
+                            << ", getHMT: " << corr_lctsDatasTmp[lct].getHMT()
+			    << std::dec << std::endl;
+*/
+            if (getCSCHisto(h::CSC_CORR_LCTXX_HITS_DISTRIBUTION, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getStrip(), corr_lctsDatas[lct].getKeyWG());
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_WG, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getKeyWG());
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_HALFSTRIP, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getStrip(2));
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_QUARTSTRIP, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getStrip(4));
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_EIGHTSTRIP, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getStrip(8));
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_RUN3_TO_RUN2_PATTERN, crateID, dmbID, lct, mo)) {
+              int bend = corr_lctsDatas[lct].getSlope() + ((corr_lctsDatas[lct].getBend() & 0x1) << 4);
+              mo->Fill(bend, corr_lctsDatas[lct].getPattern());
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_BEND_VS_SLOPE, crateID, dmbID, lct, mo)) {
+              mo->Fill(corr_lctsDatas[lct].getSlope(), corr_lctsDatas[lct].getBend());
+            }
+
+            if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_STRIP_TYPE, crateID, dmbID, lct, mo)) {
+              int strip_type = (corr_lctsDatas[lct].getQuartStrip() << 1) + (corr_lctsDatas[lct].getEighthStrip());
+              mo->Fill(strip_type);
+            }
+
+            // std::cout << cid.station() << " " << cid.ring() << std::endl;
+            if ((cid.station() == 1) && (cid.ring() == 1)) {
+              if (getCSCHisto(h::CSC_CORR_LCTXX_RUN3_ME11_QUALITY, crateID, dmbID, lct, mo)) {
+                mo->Fill(corr_lctsDatas[lct].getQuality());
+              }
+            }
+
+            if (lct == 0) {
+              /*
+              if (getCSCHisto(h::CSC_CORR_LCT_RUN3_PATTERN_ID, crateID, dmbID, mo)) {
+                mo->Fill(corr_lctsDatasTmp[lct].getRun3PatternID());
+              }
+              */
+              if (getCSCHisto(h::CSC_CORR_LCT_RUN3_HMT_DISTRIBUTION, crateID, dmbID, mo)) {
+                mo->Fill(corr_lctsDatasTmp[lct].getHMT());
+              }
+            }
+          }
+
+          if (data.nalct()) {
+            CSCALCTHeader* alctHeader = data.alctHeader();
+            if (alctHeader) {
+              std::vector<CSCALCTDigi> alctsDatasTmp = alctHeader->ALCTDigis();
+              std::vector<CSCALCTDigi> alctsDatas;
+              std::vector<uint32_t> keyWG_list;
+              keyWG_list.clear();
+              for (uint32_t lct = 0; lct < alctsDatasTmp.size(); lct++) {
+                if (alctsDatasTmp[lct].isValid()) {
+                  alctsDatas.push_back(alctsDatasTmp[lct]);
+                  keyWG_list.push_back(alctsDatasTmp[lct].getKeyWG());
+                }
+              }
+
+              for (uint32_t lct = 0; lct < corr_lctsDatasTmp.size(); lct++) {
+                if (corr_lctsDatasTmp[lct].isValid()) {
+                  for (uint32_t i = 0; i < keyWG_list.size(); i++) {
+                    /// Find matching keyWG from ALCT keyWG list
+                    if (corr_lctsDatasTmp[lct].getKeyWG() == keyWG_list[i]) {
+                      if ((lct == 0) && getCSCHisto(h::CSC_CORR_LCT0_VS_ALCT0_KEY_WG, crateID, dmbID, mo))
+                        mo->Fill(alctsDatas[i].getKeyWG(), corr_lctsDatasTmp[lct].getKeyWG());
+                      if ((lct == 1) && getCSCHisto(h::CSC_CORR_LCT1_VS_ALCT1_KEY_WG, crateID, dmbID, mo))
+                        mo->Fill(alctsDatas[i].getKeyWG(), corr_lctsDatasTmp[lct].getKeyWG());
+                      if (getCSCHisto(h::CSC_CORR_LCT_VS_ALCT_DIGI_MATCH, crateID, dmbID, mo)) {
+                        mo->Fill(lct, i);
+                      }
+                      continue;
+                    }
+                  }
+                }
+              }
+            }
           }
 
           FEBunpacked = FEBunpacked + 1;
@@ -1090,6 +1296,13 @@ namespace cscdqm {
 
               if (getCSCHisto(h::CSC_CLCTXX_KEYHALFSTRIP, crateID, dmbID, lct, mo))
                 mo->Fill(clctsDatas[lct].getKeyStrip());
+
+              /* === Run3 CSC-GEM Trigger data format */
+              if (getCSCHisto(h::CSC_CLCTXX_KEY_QUARTSTRIP, crateID, dmbID, lct, mo))
+                mo->Fill(clctsDatas[lct].getKeyStrip(4));
+              if (getCSCHisto(h::CSC_CLCTXX_KEY_EIGHTSTRIP, crateID, dmbID, lct, mo))
+                mo->Fill(clctsDatas[lct].getKeyStrip(8));
+              /* === Run3 */
 
               if (getCSCHisto(h::CSC_CLCTXX_DTIME_VS_HALF_STRIP, crateID, dmbID, lct, mo)) {
                 mo->Fill((int)(clctsDatas[lct].getKeyStrip()), clct_dtime);
