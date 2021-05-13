@@ -97,6 +97,9 @@ private:
   int numOfEvents;
   unsigned int errorMask, examinerMask;
   bool instantiateDQM;
+
+  bool disableMappingCheck, b904Setup;
+
   CSCMonitorInterface* monitor;
 
   /// Token for consumes interface & access to data
@@ -127,6 +130,11 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   printEventNumber = pset.getUntrackedParameter<bool>("PrintEventNumber", true);
   debug = pset.getUntrackedParameter<bool>("Debug", false);
   instantiateDQM = pset.getUntrackedParameter<bool>("runDQM", false);
+
+  // Disable FED/DDU to chamber mapping inconsistency check
+  disableMappingCheck = pset.getUntrackedParameter<bool>("DisableMappingCheck", false);
+  // Make aware the unpacker that B904 test setup is used (disable mapping inconsistency check)
+  b904Setup = pset.getUntrackedParameter<bool>("B904Setup", false);
 
   /// Visualization of raw data
   visualFEDInspect = pset.getUntrackedParameter<bool>("VisualFEDInspect", false);
@@ -206,6 +214,9 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.addUntracked<bool>("VisualFEDShort", false)->setComment("# Visualization of raw data in corrupted events");
   desc.addUntracked<bool>("FormatedEventDump", false);
   desc.addUntracked<bool>("SuppressZeroLCT", true);
+  desc.addUntracked<bool>("DisableMappingCheck", false)
+      ->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
+  desc.addUntracked<bool>("B904Setup", false)->setComment("# Make the unpacker aware of B904 test setup configuration");
   descriptions.add("muonCSCDCCUnpacker", desc);
   descriptions.setComment(" This is the generic cfi file for CSC unpacking");
 }
@@ -460,7 +471,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if ((dduid >= 1) && (dduid <= 36))
                 dduid = postLS1_map[dduid - 1];  // Fix for Post-LS1 FED/DDU IDs mappings
               // std::cout << "CSC " << layer << " -> " << id << ":" << dduid << ":" << vmecrate << ":" << dmb ;
-              if (id != dduid) {
+
+              /// Do not skip chamber data if mapping check is disabled or b904 setup data file is used
+              if ((!disableMappingCheck) && (!b904Setup) && (id != dduid)) {
                 LogTrace("CSCDDUUnpacker|CSCRawToDigi") << " CSC->FED/DDU mapping inconsistency!!! ";
                 LogTrace("CSCDCCUnpacker|CSCRawToDigi")
                     << "readout FED/DDU ID=" << id << " expected ID=" << dduid << ", skipping chamber " << layer
