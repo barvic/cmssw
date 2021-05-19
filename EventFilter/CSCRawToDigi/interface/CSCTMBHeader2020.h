@@ -7,7 +7,7 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
   enum { NWORDS = 43 };
   CSCTMBHeader2020();
   CSCTMBHeader2020(const unsigned short* buf);
-  void setEventInformation(const CSCDMBHeader& dmbHeader);
+  void setEventInformation(const CSCDMBHeader& dmbHeader) override;
 
   uint16_t BXNCount() const override { return bits.bxnCount; }
   uint16_t ALCTMatchTime() const override { return bits.matchWin; }
@@ -27,23 +27,23 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
   uint16_t syncErrorMPC1() const override { return 0; }
 
   // == Run 3 CSC-GEM Trigger Format
-  virtual uint16_t CLCT0_ComparatorCode() const { return bits.clct0_comparator_code; }
-  virtual uint16_t CLCT1_ComparatorCode() const { return bits.clct1_comparator_code; }
-  virtual uint16_t CLCT0_xky() const { return bits.clct0_xky; }
-  virtual uint16_t CLCT1_xky() const { return bits.clct1_xky; }
-  virtual uint16_t HMT_nhits() const {
+  uint16_t CLCT0_ComparatorCode() const override { return bits.clct0_comparator_code; }
+  uint16_t CLCT1_ComparatorCode() const override { return bits.clct1_comparator_code; }
+  uint16_t CLCT0_xky() const override { return bits.clct0_xky; }
+  uint16_t CLCT1_xky() const override { return bits.clct1_xky; }
+  uint16_t HMT_nhits() const override {
     return ((bits.hmt_nhits_bit0 & 0x1) + ((bits.hmt_nhits_bit1 & 0x1) << 1) +
             ((bits.hmt_nhits_bits_high & 0x1F) << 2));
   }
-  virtual uint16_t GEM_enabled_fibers() const { return (bits.gem_enabled_fibers & 0xF); }
-  virtual uint16_t GEM_fifo_tbins() const { return bits.fifo_tbins_gem; }
-  virtual uint16_t GEM_fifo_pretrig() const { return bits.fifo_pretrig_gem; }
-  virtual uint16_t GEM_zero_suppress() const { return bits.gem_zero_suppression; }
-  virtual uint16_t GEM_sync_dataword() const {
+  uint16_t GEM_enabled_fibers() const override { return (bits.gem_enabled_fibers & 0xF); }
+  uint16_t GEM_fifo_tbins() const override { return bits.fifo_tbins_gem; }
+  uint16_t GEM_fifo_pretrig() const override { return bits.fifo_pretrig_gem; }
+  uint16_t GEM_zero_suppress() const override { return bits.gem_zero_suppression; }
+  uint16_t GEM_sync_dataword() const override {
     return ((bits.copad_match & 0xFF) + (bits.gemA_vpf << 8) + (bits.gemB_vpf << 9) + (bits.gemA_over_flow << 10) +
             (bits.gemB_over_flow << 11) + (bits.gemA_sync << 12) + (bits.gemB_sync << 13) + (bits.gems_sync << 14));
   }
-  virtual uint16_t GEM_timing_dataword() const {
+  uint16_t GEM_timing_dataword() const override {
     return ((bits.gem_delay & 0xFF) + ((bits.gem_clct_win & 0xF) << 8) + ((bits.alct_gem_win & 0x7) << 12));
   }
 
@@ -53,18 +53,18 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
   // ==
 
   ///returns CLCT digis
-  virtual std::vector<CSCCLCTDigi> CLCTDigis(uint32_t idlayer);
+  std::vector<CSCCLCTDigi> CLCTDigis(uint32_t idlayer) override;
   ///returns CorrelatedLCT digis
-  virtual std::vector<CSCCorrelatedLCTDigi> CorrelatedLCTDigis(uint32_t idlayer) const;
+  std::vector<CSCCorrelatedLCTDigi> CorrelatedLCTDigis(uint32_t idlayer) const override;
 
   /// in 16-bit words.  Add olne because we include beginning(b0c) and
   /// end (e0c) flags
-  unsigned short int sizeInWords() const { return NWORDS; }
+  unsigned short int sizeInWords() const override { return NWORDS; }
 
-  virtual unsigned short int NHeaderFrames() const { return bits.nHeaderFrames; }
+  unsigned short int NHeaderFrames() const override { return bits.nHeaderFrames; }
   /// returns the first data word
-  virtual unsigned short* data() { return (unsigned short*)(&bits); }
-  virtual bool check() const { return bits.e0bline == 0x6e0b; }
+  unsigned short* data() override { return (unsigned short*)(&bits); }
+  bool check() const override { return bits.e0bline == 0x6e0b; }
 
   /// Needed before data packing
   //void setChamberId(const CSCDetId & detId) {theChamberId = detId;}
@@ -80,7 +80,7 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
 
   void swapCLCTs(CSCCLCTDigi& digi1, CSCCLCTDigi& digi2);
 
-  virtual void print(std::ostream& os) const;
+  void print(std::ostream& os) const override;
 
   struct {
     // 0

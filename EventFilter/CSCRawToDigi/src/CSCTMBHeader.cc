@@ -187,7 +187,7 @@ CSCTMBHeader2013 CSCTMBHeader::tmbHeader2013() const {
 
 CSCTMBHeader2020 CSCTMBHeader::tmbHeader2020() const {
   CSCTMBHeader2020 *result = dynamic_cast<CSCTMBHeader2020 *>(theHeaderFormat.get());
-  if (result == 0) {
+  if (result == nullptr) {
     throw cms::Exception("Could not get 2020 TMB header format");
   }
   return *result;
