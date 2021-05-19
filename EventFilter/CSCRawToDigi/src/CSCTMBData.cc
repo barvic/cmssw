@@ -189,14 +189,16 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
     firmwareRevision = buf[b0cLine + 7] & 0x7fff;
     Ntbins = buf[b0cLine + 19] & 0xF8;
     if ((firmwareRevision < 0x4000) /* New Run3 (O)TMB firmware revision format */
-        && (((firmwareRevision >> 9) & 0xF) == 0x2))
+        && (((firmwareRevision >> 9) & 0x2) == 0x2))
       isGEMfirmware = true;
 
     if (isGEMfirmware) {
       // for (int i=0; i<4; i++) NGEMEnabled += (buf[b0cLine+36] >> i) & 0x1; // Get number of enabled GEM fibers
       NGEMEnabled = 2;
       NGEMtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get GEM tbins
-    } else {
+    }
+//    } else {
+    {
       NRPCtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get RPC tbins
     }
   } else if (buf[b0cLine] == 0x6b0c) {
