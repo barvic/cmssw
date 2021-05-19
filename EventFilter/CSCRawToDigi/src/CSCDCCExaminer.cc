@@ -994,7 +994,7 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
             // Number of enabled GEM Fibers * nTimebins
             TMB_WordsGEM = Enabled_GEMs * ((buf_1[0] >> 5) & 0x1F) * 4;
             TMB_WordsGEM += 2;  // add header/trailer for block of GEM raw hits
-          } 
+          }
           {
             // On/off * nRPCs * nTimebins * 2 words/RPC/bin
             TMB_WordsRPC = ((buf_1[0] & 0x0010) >> 4) * ((buf_1[0] & 0x000c) >> 2) * ((buf_1[0] >> 5) & 0x1F) * 2;

@@ -24,7 +24,7 @@ CSCTMBData::CSCTMBData()
       theE0FLine(0),
       theTMBHeader(2007, 0x50c3),
       theComparatorData(&theTMBHeader),
-      theGEMData(0),
+      theGEMData(nullptr),
       theTMBScopeIsPresent(false),
       theTMBScope(nullptr),
       theTMBMiniScopeIsPresent(false),
@@ -43,7 +43,7 @@ CSCTMBData::CSCTMBData(int firmwareVersion, int firmwareRevision, int cfebs)
       theE0FLine(0),
       theTMBHeader(firmwareVersion, firmwareRevision),
       theComparatorData(&theTMBHeader),
-      theGEMData(0),
+      theGEMData(nullptr),
       theTMBScopeIsPresent(false),
       theTMBScope(nullptr),
       theTMBMiniScopeIsPresent(false),
@@ -64,7 +64,7 @@ CSCTMBData::CSCTMBData(const uint16_t* buf)
     : theOriginalBuffer(buf),
       theTMBHeader(2007, 0x50c3),
       theComparatorData(&theTMBHeader),
-      theGEMData(0),
+      theGEMData(nullptr),
       theTMBScopeIsPresent(false),
       theTMBScope(nullptr),
       theTMBMiniScopeIsPresent(false),
@@ -116,7 +116,7 @@ CSCTMBData::CSCTMBData(const CSCTMBData& data)
   if (theGEMDataIsPresent) {
     theGEMData = new CSCGEMData(*(data.theGEMData));
   } else {
-    theGEMData = 0;
+    theGEMData = nullptr;
   }
 }
 
@@ -197,7 +197,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
       NGEMEnabled = 2;
       NGEMtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get GEM tbins
     }
-//    } else {
+    //    } else {
     {
       NRPCtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get RPC tbins
     }
@@ -278,7 +278,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
     if (d04Line != -1) {
       theGEMDataIsPresent = true;
       theGEMData = new CSCGEMData(buf + c04Line, d04Line - c04Line + 1);
-      if (theGEMData != NULL)
+      if (theGEMData != nullptr)
         currentPosition += theGEMData->sizeInWords();
     } else {
       LogTrace("CSCTMBData|CSCRawToDigi") << "CSCTMBData::corrupt GEM data! Failed to find end! ";
