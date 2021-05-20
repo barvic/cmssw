@@ -415,10 +415,10 @@ CSCTMBMiniScope& CSCTMBData::tmbMiniScope() const {
   return *theTMBMiniScope;
 }
 
-CSCTMBBlockedCFEB& CSCTMBData::tmbBlockedCFEB() const {
-  if (!theBlockedCFEBIsPresent)
-    throw("No TMB Blocked CFEB in this chamber");
-  return *theTMBBlockedCFEB;
+CSCGEMData* CSCTMBData::gemData() const {
+  if (!theGEMDataIsPresent)
+    throw("No GEM Data in this chamber");
+  return theGEMData;
 }
 
 std::bitset<22> CSCTMBData::nextCRC22_D16(const std::bitset<16>& D, const std::bitset<22>& C) {
