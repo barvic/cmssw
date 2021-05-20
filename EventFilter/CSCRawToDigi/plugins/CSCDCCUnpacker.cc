@@ -563,7 +563,7 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                 if (cscData[iCSC].tmbData()->hasGEM()) {
                   for (int unsigned igem = 0; igem < (int unsigned)(cscData[iCSC].tmbData()->gemData()->numGEMs());
                        ++igem) {
-                    /// !!! TODO: Needs mapping for CSCDetId to  GEMDetId
+                    /// !!! TODO: Needs mapping for CSCDetId to GEMDetId
                     int gem_chamber = igem;
                     if (b904Setup) {
                       GEMDetId gemid(1, 1, 1, 1, gem_chamber, 1); /// Dummy id for b904

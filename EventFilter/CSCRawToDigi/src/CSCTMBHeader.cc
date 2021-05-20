@@ -41,7 +41,7 @@ CSCTMBHeader::CSCTMBHeader(int firmwareVersion, int firmwareRevision)
         bool isGEMfirmware = false;
         /* There are OTMB2013 firmware versions exist, which reports firmwareRevision code = 0x0 */
         if ((firmwareRevision < 0x4000) && (firmwareRevision > 0x0)) { /* New (O)TMB firmware revision format */
-          if (((firmwareRevision >> 9) & 0xF) == 0x2)
+          if (((firmwareRevision >> 9) & 0x2) == 0x2)
             isGEMfirmware = true;
           if (isGEMfirmware) {
             theHeaderFormat = std::shared_ptr<CSCVTMBHeaderFormat>(new CSCTMBHeader2020());
@@ -84,7 +84,7 @@ CSCTMBHeader::CSCTMBHeader(const unsigned short *buf) : theHeaderFormat() {
         /* There are OTMB2013 firmware versions exist, which reports firmwareRevision code = 0x0 */
         if ((firmwareRevision < 0x4000) && (firmwareRevision > 0x0)) { /* New (O)TMB firmware revision format */
           theFirmwareVersion = 2020;
-          if (((firmwareRevision >> 11) & 0xF) == 0x2)
+          if (((firmwareRevision >> 9) & 0x2) == 0x2)
             isGEMfirmware = true;
         }
 
