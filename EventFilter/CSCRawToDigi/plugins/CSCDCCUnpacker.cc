@@ -53,6 +53,7 @@
 #include "EventFilter/CSCRawToDigi/interface/CSCTMBData.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCDCCEventData.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCCFEBData.h"
+#include "EventFilter/CSCRawToDigi/interface/CSCGEMData.h"
 #include "EventFilter/CSCRawToDigi/interface/CSCMonitorInterface.h"
 
 #include <iostream>
@@ -552,11 +553,24 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               } else
                 clctProduct->move(std::make_pair(clctDigis.begin(), clctDigis.end()), layer);
 
-              /// fill cscrpc digi
+              /// fill CSC-RPC or CSC-GEMs digis
               if (cscData[iCSC].tmbData()->checkSize()) {
                 if (cscData[iCSC].tmbData()->hasRPC()) {
                   std::vector<CSCRPCDigi> rpcDigis = cscData[iCSC].tmbData()->rpcData()->digis();
                   rpcProduct->move(std::make_pair(rpcDigis.begin(), rpcDigis.end()), layer);
+                }
+
+                if (cscData[iCSC].tmbData()->hasGEM()) {
+                  for (int unsigned igem = 0; igem < (int unsigned)(cscData[iCSC].tmbData()->gemData()->numGEMs());
+                       ++igem) {
+                    /// !!! TODO: Needs mapping for CSCDetId to  GEMDetId
+                    int gem_chamber = igem;
+                    if (b904Setup) {
+                      GEMDetId gemid(1, 1, 1, 1, gem_chamber, 1); /// Dummy id for b904
+                      std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->digis(igem);
+                      gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
+                    }
+                  }
                 }
               } else
                 LogTrace("CSCDCCUnpacker|CSCRawToDigi") << " TMBData check size failed!";
