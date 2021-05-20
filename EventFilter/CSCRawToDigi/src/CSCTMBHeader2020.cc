@@ -9,7 +9,7 @@ const std::vector<std::pair<unsigned, unsigned> >
                                {3, 3}, {3, 4}, {4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4}}; /* pattern IDs 30,31 are reserved */
 
 const unsigned run2_pattern_lookup_tbl[2][16] = {{10, 10, 10, 8, 8, 8, 6, 6, 6, 4, 4, 4, 2, 2, 2, 2},
-                                                 {10, 10, 0, 9, 9, 9, 7, 7, 7, 5, 5, 5, 3, 3, 3, 3}};
+                                                 {10, 10, 10, 9, 9, 9, 7, 7, 7, 5, 5, 5, 3, 3, 3, 3}};
 
 CSCTMBHeader2020::CSCTMBHeader2020() {
   bzero(data(), sizeInWords() * 2);
