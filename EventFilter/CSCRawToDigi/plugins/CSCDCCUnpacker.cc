@@ -565,9 +565,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                        ++igem) {
                     /// !!! TODO: Needs mapping for CSCDetId to GEMDetId
                     int gem_chamber = layer.chamber();
-                    int gem_region = (layer.endcap()==1)?1:-1;  
+                    int gem_region = (layer.endcap() == 1) ? 1 : -1;
                     if (b904Setup) {
-                      GEMDetId gemid(gem_region, layer.ring(), layer.station(), igem+1, gem_chamber, 0); /// Dummy id for b904
+                      GEMDetId gemid(
+                          gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, 0);  /// Dummy id for b904
                       std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->digis(igem);
                       gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
                     }

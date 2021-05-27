@@ -36,8 +36,25 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
   int strip = halfstrip % 32;
   int xky = bits.clct0_xky & 0x3;  // CLCT0 1/4 and 1/8 strip bits
   int cfeb = halfstrip / 32;
-  int pattern = bits.clct0_shape;
-  int bend = pattern & 0x1;
+
+  /// !!! Temporary fixes for Run3 CLCT Digis unpacking
+  ///     Re-use missing Run3 CLCT parameters from the MPC frames
+  // int pattern = bits.clct0_shape;
+  // int bend = pattern & 0x1;
+  int run3_pattern = bits.clct0_shape & 0x7;  // 3-bit Run3 CLCT PatternID
+  int bend = bits.MPC_Muon0_clct_LR;          // Re-use missing Run3 CLCT L/R bend from MPC frame
+  int slope = (bits.MPC_Muon0_clct_bend_low & 0x7) |
+              (bits.MPC_Muon0_clct_bend_bit4 << 3);  // Re-use missing 4-bit Run3 CLCT slope from MPC frame
+
+  /// !!! Ugly check if CLCT0 is not LCT0, but LCT1
+  if ((halfstrip != bits.MPC_Muon0_clct_key_halfstrip) && (halfstrip == bits.MPC_Muon1_clct_key_halfstrip)) {
+    bend = bits.MPC_Muon1_clct_LR;
+    slope = (bits.MPC_Muon1_clct_bend_low & 0x7) | (bits.MPC_Muon1_clct_bend_bit4 << 3);
+  }
+
+  int run2_pattern = run2_pattern_lookup_tbl[bend][slope];
+  int pattern = (run2_pattern & 0xf) + ((run3_pattern & 0x7) << 4) + ((slope & 0xF) << 7);
+
   int quart = (xky >> 1) & 0x1;
   int eight = xky & 0x1;
   //offlineStripNumbering(strip, cfeb, pattern, bend);
@@ -59,8 +76,25 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
   strip = halfstrip % 32;
   xky = bits.clct1_xky & 0x3;  // CLCT1 1/4 and 1/8 strip bits
   cfeb = halfstrip / 32;
-  pattern = bits.clct1_shape;
-  bend = pattern & 0x1;
+
+  /// !!! Temporary fixes for Run3 CLCT Digis unpacking
+  ///     Re-use missing Run3 CLCT parameters from the MPC frames
+  // int pattern = bits.clct1_shape;
+  // int bend = pattern & 0x1;
+  run3_pattern = bits.clct1_shape & 0x7;  // 3-bit Run3 CLCT PatternID
+  bend = bits.MPC_Muon1_clct_LR;          // Re-use missing Run3 CLCT L/R bend from MPC frame
+  slope = (bits.MPC_Muon1_clct_bend_low & 0x7) |
+          (bits.MPC_Muon1_clct_bend_bit4 << 3);  // Re-use missing 4-bit Run3 CLCT slope from MPC frame
+
+  /// !!! Ugly check if CLCT1 is not LCT1, but LCT0
+  if ((halfstrip != bits.MPC_Muon1_clct_key_halfstrip) && (halfstrip == bits.MPC_Muon0_clct_key_halfstrip)) {
+    bend = bits.MPC_Muon0_clct_LR;
+    slope = (bits.MPC_Muon0_clct_bend_low & 0x7) | (bits.MPC_Muon0_clct_bend_bit4 << 3);
+  }
+
+  run2_pattern = run2_pattern_lookup_tbl[bend][slope];
+  pattern = (run2_pattern & 0xf) + ((run3_pattern & 0x7) << 4) + ((slope & 0xF) << 7);
+
   quart = (xky >> 1) & 0x1;
   eight = xky & 0x1;
 
@@ -153,7 +187,7 @@ void CSCTMBHeader2020::addALCT1(const CSCALCTDigi& digi) {
 
 void CSCTMBHeader2020::addCLCT0(const CSCCLCTDigi& digi) {
   int halfStrip = digi.getKeyStrip();
-  int pattern = digi.getPattern();
+  int pattern = digi.getRun3Pattern();
   //hardwareStripNumbering(strip, cfeb, pattern, bend);
   bits.clct0_valid = digi.isValid();
   bits.clct0_quality = digi.getQuality();
@@ -170,7 +204,7 @@ void CSCTMBHeader2020::addCLCT0(const CSCCLCTDigi& digi) {
 
 void CSCTMBHeader2020::addCLCT1(const CSCCLCTDigi& digi) {
   int halfStrip = digi.getKeyStrip();
-  int pattern = digi.getPattern();
+  int pattern = digi.getRun3Pattern();
   //hardwareStripNumbering(strip, cfeb, pattern, bend);
   bits.clct1_valid = digi.isValid();
   bits.clct1_quality = digi.getQuality();
