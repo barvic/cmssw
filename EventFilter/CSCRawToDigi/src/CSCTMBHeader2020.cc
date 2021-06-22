@@ -32,18 +32,21 @@ void CSCTMBHeader2020::setEventInformation(const CSCDMBHeader& dmbHeader) {
 ///returns CLCT digis
 std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
   std::vector<CSCCLCTDigi> result;
-  int halfstrip = bits.clct0_key_low + (bits.clct0_key_high << 7);
-  int strip = halfstrip % 32;
-  int xky = bits.clct0_xky & 0x3;  // CLCT0 1/4 and 1/8 strip bits
-  int cfeb = halfstrip / 32;
+  unsigned halfstrip = bits.clct0_key_low + (bits.clct0_key_high << 7);
+  unsigned strip = halfstrip % 32;
+  // CLCT0 1/4 strip bit
+  bool quartstrip = (bits.clct0_xky >> 1) & 0x1;
+  // CLCT1 1/8 strip bit
+  bool eighthstrip = bits.clct0_xky & 0x1;
+  unsigned cfeb = halfstrip / 32;
 
   /// !!! Temporary fixes for Run3 CLCT Digis unpacking
   ///     Re-use missing Run3 CLCT parameters from the MPC frames
   // int pattern = bits.clct0_shape;
   // int bend = pattern & 0x1;
-  int run3_pattern = bits.clct0_shape & 0x7;  // 3-bit Run3 CLCT PatternID
-  int bend = bits.MPC_Muon0_clct_LR;          // Re-use missing Run3 CLCT L/R bend from MPC frame
-  int slope = (bits.MPC_Muon0_clct_bend_low & 0x7) |
+  unsigned run3_pattern = bits.clct0_shape & 0x7;  // 3-bit Run3 CLCT PatternID
+  unsigned bend = bits.MPC_Muon0_clct_LR;          // Re-use missing Run3 CLCT L/R bend from MPC frame
+  unsigned slope = (bits.MPC_Muon0_clct_bend_low & 0x7) |
               (bits.MPC_Muon0_clct_bend_bit4 << 3);  // Re-use missing 4-bit Run3 CLCT slope from MPC frame
 
   /// !!! Ugly check if CLCT0 is not LCT0, but LCT1
@@ -51,30 +54,33 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
     bend = bits.MPC_Muon1_clct_LR;
     slope = (bits.MPC_Muon1_clct_bend_low & 0x7) | (bits.MPC_Muon1_clct_bend_bit4 << 3);
   }
+  unsigned run2_pattern = run2_pattern_lookup_tbl[bend][slope];
 
-  int run2_pattern = run2_pattern_lookup_tbl[bend][slope];
-  int pattern = (run2_pattern & 0xf) + ((run3_pattern & 0x7) << 4) + ((slope & 0xF) << 7);
-
-  int quart = (xky >> 1) & 0x1;
-  int eight = xky & 0x1;
   //offlineStripNumbering(strip, cfeb, pattern, bend);
   CSCCLCTDigi digi0(bits.clct0_valid,
                     bits.clct0_quality,
-                    pattern,
+                    run2_pattern,
                     1,
                     bend,
-                    strip + (quart << 5) + (eight << 6),
+                    strip,
                     cfeb,
                     bits.clct_bxn,
                     1,
                     bits.bxnPreTrigger,
                     bits.clct0_comparator_code,
-                    CSCCLCTDigi::Version::Run3);
+                    CSCCLCTDigi::Version::Run3,
+                    quartstrip,
+                    eighthstrip,
+                    run3_pattern,
+                    slope);
   //digi0.setFullBX(bits.bxnPreTrigger);
 
   halfstrip = bits.clct1_key_low + (bits.clct1_key_high << 7);
   strip = halfstrip % 32;
-  xky = bits.clct1_xky & 0x3;  // CLCT1 1/4 and 1/8 strip bits
+  // CLCT0 1/4 strip bit
+  quartstrip = (bits.clct1_xky >> 1) & 0x1;
+  // CLCT1 1/8 strip bit
+  eighthstrip = bits.clct1_xky & 0x1;
   cfeb = halfstrip / 32;
 
   /// !!! Temporary fixes for Run3 CLCT Digis unpacking
@@ -93,24 +99,24 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
   }
 
   run2_pattern = run2_pattern_lookup_tbl[bend][slope];
-  pattern = (run2_pattern & 0xf) + ((run3_pattern & 0x7) << 4) + ((slope & 0xF) << 7);
-
-  quart = (xky >> 1) & 0x1;
-  eight = xky & 0x1;
 
   //offlineStripNumbering(strip, cfeb, pattern, bend);
   CSCCLCTDigi digi1(bits.clct1_valid,
                     bits.clct1_quality,
-                    pattern,
+                    run2_pattern,
                     1,
                     bend,
-                    strip + (quart << 5) + (eight << 6),
+                    strip,
                     cfeb,
                     bits.clct_bxn,
                     2,
                     bits.bxnPreTrigger,
                     bits.clct1_comparator_code,
-                    CSCCLCTDigi::Version::Run3);
+                    CSCCLCTDigi::Version::Run3,
+                    quartstrip,
+                    eighthstrip,
+                    run3_pattern,
+                    slope);
   //digi1.setFullBX(bits.bxnPreTrigger);
 
   result.push_back(digi0);
@@ -122,15 +128,14 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
 std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020::CorrelatedLCTDigis(uint32_t idlayer) const {
   std::vector<CSCCorrelatedLCTDigi> result;
   /// for the zeroth MPC word:
-  int strip = bits.MPC_Muon0_clct_key_halfstrip;  //this goes from 0-223
-  strip = (strip & 0xFF) | (bits.MPC_Muon0_clct_QuarterStrip << 8) | (bits.MPC_Muon0_clct_EighthStrip << 9);
-  int slope = (bits.MPC_Muon0_clct_bend_low & 0x7) | (bits.MPC_Muon0_clct_bend_bit4 << 3);
-  int hmt = bits.MPC_Muon_HMT_bit0 | (bits.MPC_Muon_HMT_high << 1);  // HighMultiplicityTrigger
-  int clct_pattern_id = bits.MPC_Muon_clct_pattern_low | (bits.MPC_Muon_clct_pattern_bit5 << 4);
+  unsigned strip = bits.MPC_Muon0_clct_key_halfstrip;  //this goes from 0-223
+  unsigned slope = (bits.MPC_Muon0_clct_bend_low & 0x7) | (bits.MPC_Muon0_clct_bend_bit4 << 3);
+  unsigned hmt = bits.MPC_Muon_HMT_bit0 | (bits.MPC_Muon_HMT_high << 1);  // HighMultiplicityTrigger
+  unsigned clct_pattern_id = bits.MPC_Muon_clct_pattern_low | (bits.MPC_Muon_clct_pattern_bit5 << 4);
 
   std::pair<unsigned, unsigned> run3_pattern_pair = run3_pattern_lookup_tbl[clct_pattern_id % 30];
-  int run2_pattern = run2_pattern_lookup_tbl[bits.MPC_Muon0_clct_LR][slope];
-  int pattern = (run2_pattern & 0xf) + ((run3_pattern_pair.second & 0x7) << 4) + ((slope & 0xF) << 7);
+  unsigned run2_pattern = run2_pattern_lookup_tbl[bits.MPC_Muon0_clct_LR][slope];
+  unsigned run3_pattern = run3_pattern_pair.second & 0x7;
 
   //offlineHalfStripNumbering(strip);
   CSCCorrelatedLCTDigi digi(1,
@@ -138,23 +143,26 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020::CorrelatedLCTDigis(uint32_t 
                             bits.MPC_Muon0_lct_quality,
                             bits.MPC_Muon0_alct_key_wire,
                             strip,
-                            pattern,
+                            run2_pattern,
                             bits.MPC_Muon0_clct_LR,
                             bits.MPC_Muon_alct_bxn,
                             0,
                             bits.MPC_Muon0_clct_bx0,
                             0,
                             0,
-                            hmt,
-                            CSCCorrelatedLCTDigi::Version::Run3);
+                            CSCCorrelatedLCTDigi::Version::Run3,
+                            bits.MPC_Muon0_clct_QuarterStrip,
+                            bits.MPC_Muon0_clct_EighthStrip,
+                            run3_pattern,
+                            slope);
   // bits.MPC_Muon0_clct_bx0, 0, 0, hmt, CSCCorrelatedLCTDigi::Version::Run3,clct_pattern_id);
+  digi.setHMT(hmt);
   result.push_back(digi);
   /// for the first MPC word:
   strip = bits.MPC_Muon1_clct_key_halfstrip;  //this goes from 0-223
-  strip = (strip & 0xFF) | (bits.MPC_Muon1_clct_QuarterStrip << 8) | (bits.MPC_Muon1_clct_EighthStrip << 9);
   slope = (bits.MPC_Muon1_clct_bend_low & 0x7) | (bits.MPC_Muon1_clct_bend_bit4 << 3);
   run2_pattern = run2_pattern_lookup_tbl[bits.MPC_Muon1_clct_LR][slope];
-  pattern = (run2_pattern & 0xf) + ((run3_pattern_pair.first & 0x7) << 4) + ((slope & 0xF) << 7);
+  run3_pattern = run3_pattern_pair.first & 0x7;
 
   //offlineHalfStripNumbering(strip);
   digi = CSCCorrelatedLCTDigi(2,
@@ -162,16 +170,19 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020::CorrelatedLCTDigis(uint32_t 
                               bits.MPC_Muon1_lct_quality,
                               bits.MPC_Muon1_alct_key_wire,
                               strip,
-                              pattern,
+                              run2_pattern,
                               bits.MPC_Muon1_clct_LR,
                               bits.MPC_Muon_alct_bxn,
                               0,
                               bits.MPC_Muon1_clct_bx0,
                               0,
                               0,
-                              hmt,
-                              CSCCorrelatedLCTDigi::Version::Run3);
-  // bits.MPC_Muon1_clct_bx0, 0, 0, hmt, CSCCorrelatedLCTDigi::Version::Run3, clct_pattern_id);
+                              CSCCorrelatedLCTDigi::Version::Run3,
+                              bits.MPC_Muon0_clct_QuarterStrip,
+                              bits.MPC_Muon0_clct_EighthStrip,
+                              run3_pattern,
+                              slope);
+  digi.setHMT(hmt);
   result.push_back(digi);
 
   return result;
@@ -199,7 +210,7 @@ void CSCTMBHeader2020::addCLCT0(const CSCCLCTDigi& digi) {
   bits.clct_bxn = digi.getBX();
   bits.bxnPreTrigger = digi.getFullBX();
   bits.clct0_comparator_code = digi.getCompCode();
-  bits.clct0_xky = (digi.getEighthStrip() & 0x1) + ((digi.getQuartStrip() & 0x1) << 1);
+  bits.clct0_xky = (digi.getEighthStripBit() & 0x1) + ((digi.getQuartStripBit() & 0x1) << 1);
 }
 
 void CSCTMBHeader2020::addCLCT1(const CSCCLCTDigi& digi) {
@@ -218,7 +229,7 @@ void CSCTMBHeader2020::addCLCT1(const CSCCLCTDigi& digi) {
   //bits.clct_bxn = digi.getBX();
   bits.bxnPreTrigger = digi.getFullBX();
   bits.clct1_comparator_code = digi.getCompCode();
-  bits.clct1_xky = (digi.getEighthStrip() & 0x1) + ((digi.getQuartStrip() & 0x1) << 1);
+  bits.clct1_xky = (digi.getEighthStripBit() & 0x1) + ((digi.getQuartStripBit() & 0x1) << 1);
 }
 
 void CSCTMBHeader2020::addCorrelatedLCT0(const CSCCorrelatedLCTDigi& digi) {
@@ -228,8 +239,8 @@ void CSCTMBHeader2020::addCorrelatedLCT0(const CSCCorrelatedLCTDigi& digi) {
   bits.MPC_Muon0_lct_vpf = digi.isValid();
   bits.MPC_Muon0_alct_key_wire = digi.getKeyWG();
   bits.MPC_Muon0_clct_key_halfstrip = digi.getStrip(2) & 0x7F;
-  bits.MPC_Muon0_clct_QuarterStrip = digi.getQuartStrip() & 0x1;
-  bits.MPC_Muon0_clct_EighthStrip = digi.getEighthStrip() & 0x1;
+  bits.MPC_Muon0_clct_QuarterStrip = digi.getQuartStripBit() & 0x1;
+  bits.MPC_Muon0_clct_EighthStrip = digi.getEighthStripBit() & 0x1;
   bits.MPC_Muon0_lct_quality = digi.getQuality() & 0x7;
 
   // TODO: review and change
@@ -258,8 +269,8 @@ void CSCTMBHeader2020::addCorrelatedLCT1(const CSCCorrelatedLCTDigi& digi) {
   bits.MPC_Muon1_lct_vpf = digi.isValid();
   bits.MPC_Muon1_alct_key_wire = digi.getKeyWG();
   bits.MPC_Muon1_clct_key_halfstrip = digi.getStrip(2) & 0x7F;
-  bits.MPC_Muon1_clct_QuarterStrip = digi.getQuartStrip() & 0x1;
-  bits.MPC_Muon1_clct_EighthStrip = digi.getEighthStrip() & 0x1;
+  bits.MPC_Muon1_clct_QuarterStrip = digi.getQuartStripBit() & 0x1;
+  bits.MPC_Muon1_clct_EighthStrip = digi.getEighthStripBit() & 0x1;
   bits.MPC_Muon1_lct_quality = digi.getQuality() & 0x7;
 
   // To restore 5-bits Run3 CLCT Pattern ID assume that LCT0 pattern ID is already processed

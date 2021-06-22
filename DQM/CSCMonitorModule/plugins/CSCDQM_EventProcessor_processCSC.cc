@@ -925,8 +925,8 @@ namespace cscdqm {
                             << ", getCFEB: " << clctsDatasTmp[lct].getCFEB()
                             << ", getKeyStrip: " << clctsDatasTmp[lct].getKeyStrip()
                             << ", getFractionalStrip: " <<  clctsDatasTmp[lct].getFractionalStrip()
-                            << ", getQuartStrip: " << clctsDatasTmp[lct].getQuartStrip()
-                            << ", getEightStrip: " << clctsDatasTmp[lct].getEightStrip()
+                            << ", getQuartStrip: " << clctsDatasTmp[lct].getQuartStripBit()
+                            << ", getEightStrip: " << clctsDatasTmp[lct].getEightStripBit()
                             << ",\n    getCompCode: 0x" << std::hex << clctsDatasTmp[lct].getCompCode()
                             << ", getQuality: " << clctsDatasTmp[lct].getQuality() << std::dec
                             << ", getPattern: " << clctsDatasTmp[lct].getPattern() << std::dec
@@ -981,8 +981,8 @@ namespace cscdqm {
                             << ", getKeyWG: " << corr_lctsDatasTmp[lct].getKeyWG()
                             << ", getQuality: " << corr_lctsDatasTmp[lct].getQuality()
                             << ", getFractionalStrip: " <<  corr_lctsDatasTmp[lct].getFractionalStrip()
-                            << ", getQuartStrip: " << corr_lctsDatasTmp[lct].getQuartStrip()
-                            << ", getEightStrip: " << corr_lctsDatasTmp[lct].getEightStrip()
+                            << ", getQuartStrip: " << corr_lctsDatasTmp[lct].getQuartStripBit()
+                            << ", getEightStrip: " << corr_lctsDatasTmp[lct].getEightStripBit()
                             << ",\n getSlope: " << corr_lctsDatasTmp[lct].getSlope() << std::dec
                             << ", getBend: " << corr_lctsDatasTmp[lct].getBend()
                             << ", getBX: " << corr_lctsDatasTmp[lct].getBX()
@@ -1022,7 +1022,7 @@ namespace cscdqm {
             }
 
             if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_STRIP_TYPE, crateID, dmbID, lct, mo)) {
-              int strip_type = (corr_lctsDatas[lct].getQuartStrip() << 1) + (corr_lctsDatas[lct].getEighthStrip());
+              int strip_type = (corr_lctsDatas[lct].getQuartStripBit() << 1) + (corr_lctsDatas[lct].getEighthStripBit());
               mo->Fill(strip_type);
             }
 
