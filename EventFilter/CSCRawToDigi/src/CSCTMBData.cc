@@ -178,6 +178,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
   int NRPCtbins = 0;    // Number of RPC tbins
   int NGEMtbins = 0;    // Number of GEM tbins
   int NGEMEnabled = 0;  // Number of Enabled GEM Fibers
+  int GEMFibersMask = 0;
   bool isGEMfirmware = false;
 
   int b0cLine = 0;  ///assumes that buf starts at the tmb data
@@ -193,8 +194,10 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
       isGEMfirmware = true;
 
     if (isGEMfirmware) {
-      // for (int i=0; i<4; i++) NGEMEnabled += (buf[b0cLine+36] >> i) & 0x1; // Get number of enabled GEM fibers
-      NGEMEnabled = 2;
+      GEMFibersMask = buf[b0cLine + 36] & 0xf;  // GEM enabled fibers 4-bits mask
+      for (int i = 0; i < 4; i++)
+        NGEMEnabled += (buf[b0cLine + 36] >> i) & 0x1;  // Get number of enabled GEM fibers
+      // NGEMEnabled = 2;
       NGEMtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get GEM tbins
     }
     //    } else {
@@ -216,7 +219,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
   }
 
   int MaxSizeRPC = 1 + NRPCtbins * 2 * 4 + 1;
-  int MaxSizeGEM = 1 + NGEMEnabled * NGEMtbins * 8 + 1;
+  int MaxSizeGEM = 1 + NGEMEnabled * NGEMtbins * 4 + 1;
   //int MaxSizeScope = 5;
   int e0bLine = -1;
   switch (firmwareVersion) {
@@ -277,7 +280,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
     int d04Line = findLine(buf, 0x6d04, currentPosition, currentPosition + MaxSizeGEM);
     if (d04Line != -1) {
       theGEMDataIsPresent = true;
-      theGEMData = new CSCGEMData(buf + c04Line, d04Line - c04Line + 1);
+      theGEMData = new CSCGEMData(buf + c04Line, d04Line - c04Line + 1, GEMFibersMask);
       if (theGEMData != nullptr)
         currentPosition += theGEMData->sizeInWords();
     } else {
@@ -290,7 +293,7 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
   switch (firmwareVersion) {
     case 2007:
       if (theGEMDataIsPresent) {
-        TotTMBReadout = 43 + Ntbins * 6 * 5 + 1 + NGEMEnabled * NGEMtbins * 8 + 2 + 8 * 256 + 8;
+        TotTMBReadout = 43 + Ntbins * 6 * 5 + 1 + NGEMEnabled * NGEMtbins * 4 + 2 + 8 * 256 + 8;
       } else {
         TotTMBReadout = 43 + Ntbins * 6 * 5 + 1 + NRPCtbins * 2 * 4 + 2 + 8 * 256 + 8;
       };

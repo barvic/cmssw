@@ -1022,7 +1022,8 @@ namespace cscdqm {
             }
 
             if (getCSCHisto(h::CSC_CORR_LCTXX_KEY_STRIP_TYPE, crateID, dmbID, lct, mo)) {
-              int strip_type = (corr_lctsDatas[lct].getQuartStripBit() << 1) + (corr_lctsDatas[lct].getEighthStripBit());
+              int strip_type =
+                  (corr_lctsDatas[lct].getQuartStripBit() << 1) + (corr_lctsDatas[lct].getEighthStripBit());
               mo->Fill(strip_type);
             }
 

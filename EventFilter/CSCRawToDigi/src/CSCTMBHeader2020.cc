@@ -47,7 +47,7 @@ std::vector<CSCCLCTDigi> CSCTMBHeader2020::CLCTDigis(uint32_t idlayer) {
   unsigned run3_pattern = bits.clct0_shape & 0x7;  // 3-bit Run3 CLCT PatternID
   unsigned bend = bits.MPC_Muon0_clct_LR;          // Re-use missing Run3 CLCT L/R bend from MPC frame
   unsigned slope = (bits.MPC_Muon0_clct_bend_low & 0x7) |
-              (bits.MPC_Muon0_clct_bend_bit4 << 3);  // Re-use missing 4-bit Run3 CLCT slope from MPC frame
+                   (bits.MPC_Muon0_clct_bend_bit4 << 3);  // Re-use missing 4-bit Run3 CLCT slope from MPC frame
 
   /// !!! Ugly check if CLCT0 is not LCT0, but LCT1
   if ((halfstrip != bits.MPC_Muon0_clct_key_halfstrip) && (halfstrip == bits.MPC_Muon1_clct_key_halfstrip)) {
