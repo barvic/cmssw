@@ -178,8 +178,8 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020::CorrelatedLCTDigis(uint32_t 
                               0,
                               0,
                               CSCCorrelatedLCTDigi::Version::Run3,
-                              bits.MPC_Muon0_clct_QuarterStrip,
-                              bits.MPC_Muon0_clct_EighthStrip,
+                              bits.MPC_Muon1_clct_QuarterStrip,
+                              bits.MPC_Muon1_clct_EighthStrip,
                               run3_pattern,
                               slope);
   digi.setHMT(hmt);
