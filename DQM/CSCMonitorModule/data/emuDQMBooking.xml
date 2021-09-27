@@ -3745,8 +3745,8 @@
                 <XMax>224</XMax>
                 <XMin>0</XMin>
                 <XTitle>Key HalfStrips</XTitle>
-                <YBins>48</YBins>
-                <YMax>48</YMax>
+                <YBins>112</YBins>
+                <YMax>112</YMax>
                 <YMin>0</YMin>
                 <YTitle>Key Anode WG</YTitle>
                 <Name from="0" to="1">Corr_LCT%d_Hits_Distribution</Name>
@@ -3841,6 +3841,22 @@
                 <XMin>0</XMin>
                 <YTitle>Number of events</YTitle>
                 <Name from="0" to="1">Corr_LCT%d_Run3_ME11_Quality</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLabelSizeX>0.025</SetLabelSizeX>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <SetXLabels>1='Invalid|2='Low (4 layers)'|3='Medium (5 layers)'|4='High (6 layers)'|</SetXLabels>
+                <Title>Correlated LCT%d Run3 non-ME11 Quality</Title>
+                <Type>h1</Type>
+                <XBins>4</XBins>
+                <XMax>4</XMax>
+                <XMin>0</XMin>
+                <YTitle>Number of events</YTitle>
+                <Name from="0" to="1">Corr_LCT%d_Run3_Quality</Name>
         </Histogram>
 
         <Histogram>
@@ -4047,21 +4063,20 @@
                 <SetNdivisionsX>16</SetNdivisionsX>
                 <SetOption>texthist</SetOption>
                 <SetOptStat>eomr</SetOptStat>
-                <Title>Run3 Correlated LCT HMT Counter</Title>
+                <Title>Run3 HMT data field distribution</Title>
                 <Type>h1</Type>
                 <XBins>16</XBins>
                 <XMax>16</XMax>
                 <XMin>0</XMin>
-                <XTitle>Run3 HMT Counter</XTitle>
+                <XTitle>Run3 HMT data field</XTitle>
                 <YTitle>Number of events</YTitle>
-                <Name>Corr_LCT_Run3_HMT_Distribution</Name>
+                <Name>Run3_HMT_Distribution</Name>
         </Histogram>
 
         <Histogram>
                 <Folder>CLCT</Folder>
                 <Prefix>CSC</Prefix>
                 <SetLogy>1</SetLogy>
-                <SetNdivisionsX>16</SetNdivisionsX>
                 <SetOption>hist</SetOption>
                 <SetOptStat>eomr</SetOptStat>
                 <Title>CLCT HMT nHits</Title>
@@ -4074,21 +4089,138 @@
                 <Name>CLCT_Run3_HMT_nhits</Name>
         </Histogram>
 
+         <Histogram>
+                <Folder>CLCT</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLabelSizeX>0.04</SetLabelSizeX>
+                <SetLogy>1</SetLogy>
+                <SetNdivisionsX>8</SetNdivisionsX>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <SetXLabels>1='No in-time'|2='Loose in-time'|3='Nominal in-time'|4='Tight in-time'|5='No out-of-time'|6='Loose out-of-time'|7='Nominal out-of-time'|8='Tight out-of-time'|</SetXLabels>
+                <Title>Run3 HMT Hadronic Shower Trigger Types</Title>
+                <Type>h1</Type>
+                <XBins>8</XBins>
+                <XMax>8</XMax>
+                <XMin>0</XMin>
+                <XTitle>types</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>Run3_HMT_HadronicShowerTrigger</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>CLCT</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLabelSizeX>0.05</SetLabelSizeX>
+                <SetLogy>1</SetLogy>
+                <SetNdivisionsX>4</SetNdivisionsX>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <SetXLabels>1='HMT fired'|2='HMT+ALCT'|3='HMT+CLCT'|4='HMT+LCT'|</SetXLabels>
+                <Title>Run3 HMT Coincidence Match</Title>
+                <Type>h1</Type>
+                <XBins>4</XBins>
+                <XMax>4</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 HMT coincidence Match types</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>Run3_HMT_Coincidence_Match</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>CLCT</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>ALCT location in cathode HMT tagged window</Title>
+                <Type>h1</Type>
+                <XBins>16</XBins>
+                <XMax>16</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 HMT ALCT Match window</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>Run3_HMT_ALCT_Match</Name>
+        </Histogram>
+
         <Histogram>
                 <Folder>TMB</Folder>
                 <Prefix>CSC</Prefix>
-                <SetOption>hist</SetOption>
+                <SetGridx>1</SetGridx>
+                <SetGridy>1</SetGridy>
+                <SetLabelSizeX>0.03</SetLabelSizeX>
+                <SetNdivisionsX>32</SetNdivisionsX>
+                <SetNdivisionsY>11</SetNdivisionsY>
+                <SetOption>colz</SetOption>
                 <SetOptStat>e</SetOptStat>
-                <SetXLabels>1='gemA_vpf'|2='gemB_vpf'|3='gemA_overflow'|4='gemB_overflow'|5='gemA_sync'|6='gemB_sync'|7='gems_sync'|</SetXLabels>
+                <SetXLabels>1='L+0'|2='L+1'|3='L+2'|4='L+3'|5='L+4'|6='L+5'|7='L+6'|8='L+7'|9='L+8'|10='L+9'|11='L+10'|12='L+11'|13='L+12'|14='L+13'|15='L+14'|16='L+15'|17='R+0'|18='R+1'|19='R+2'|20='R+3'|21='R+4'|22='R+5'|23='R+6'|24='R+7'|25='R+8'|26='R+9'|27='R+10'|28='R+11'|29='R+12'|30='R+13'|31='R+14'|32='R+15'|</SetXLabels>
+                <Title>CLCT%d Run3 to Run2 Pattern ID</Title>
+                <Type>h2</Type>
+                <XBins>32</XBins>
+                <XMax>32</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 L/R Bend + Slope</XTitle>
+                <YBins>11</YBins>
+                <YMax>11</YMax>
+                <YMin>0</YMin>
+                <YTitle>Run2 Pattern ID</YTitle>
+                <Name from="0" to="1">CLCT%d_Run3_to_Run2_Pattern</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetNdivisionsX>16</SetNdivisionsX>
+                <SetNdivisionsY>2</SetNdivisionsY>
+                <SetOption>coltextz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>CLCT%d Run3 Slope vs LR Bend</Title>
+                <Type>h2</Type>
+                <XBins>16</XBins>
+                <XMax>16</XMax>
+                <XMin>0</XMin>
+                <XTitle>Run3 LCT Slope/Bend</XTitle>
+                <YBins>2</YBins>
+                <YMax>2</YMax>
+                <YMin>0</YMin>
+                <YTitle>Run3 LCT LR Bend</YTitle>
+                <Name from="0" to="1">CLCT%d_Run3_Bend_vs_Slope</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>texthist</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <SetXLabels>1='lct0_nogem'|2='lct0_with_gemA'|3='lct0_with_gemB'|4='lct0_with_copad'|5='lct1_nogem'|6='lct1_with_gemA'|7='lct1_with_gemB'|8='lct1_with_copad'|9='gemA_vpf'|10='gemB_vpf'|11='gemA_overflow'|12='gemB_overflow'|13='gemA_sync'|14='gemB_sync'|15='gems_sync'|</SetXLabels>
                 <Title>GEM-CSC Sync Status</Title>
                 <Type>h1</Type>
-                <XBins>7</XBins>
-                <XMax>7</XMax>
+                <XBins>15</XBins>
+                <XMax>15</XMax>
                 <XMin>0</XMin>
                 <YTitle>Number of events</YTitle>
                 <Name>GEM_Sync_Status</Name>
         </Histogram>
 
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>coltextz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <SetXLabels>1='Valid LCT0'|2='Valid LCT1'|</SetXLabels>
+                <SetYLabels>1='lct0_nogem'|2='lct0_with_gemA'|3='lct0_with_gemB'|4='lct0_with_copad'|5='lct1_nogem'|6='lct1_with_gemA'|7='lct1_with_gemB'|8='lct1_with_copad'|</SetYLabels>
+                <Title>GEM-LCT Sync Status</Title>
+                <Type>h2</Type>
+                <XBins>2</XBins>
+                <XMax>2</XMax>
+                <XMin>0</XMin>
+                <XTitle>LCT</XTitle>
+                <YBins>8</YBins>
+                <YMax>8</YMax>
+                <YMin>0</YMin>
+                <YTitle>GEM-LCT Sync Status</YTitle>
+                <Name>GEM_LCT_Sync_Status</Name>
+        </Histogram>
+<!--
         <Histogram>
                 <Folder>TMB</Folder>
                 <Prefix>CSC</Prefix>
@@ -4102,5 +4234,285 @@
                 <YTitle>Number of events</YTitle>
                 <Name>GEM_Copad_Match</Name>
         </Histogram>
+-->
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>em</SetOptStat>
+                <Title>Number of GEM Copads in event</Title>
+                <Type>h1</Type> 
+                <XBins>16</XBins>
+                <XMax>16</XMax>
+                <XMin>0</XMin>
+                <XTitle># Copads</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_Num_Copads</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>emro</SetOptStat>
+                <Title>ALCT location in GEM tagged match window</Title>
+                <Type>h1</Type> 
+                <XBins>8</XBins>
+                <XMax>8</XMax>
+                <XMin>0</XMin>
+                <XTitle>alct_gem_win</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_ALCT_Match_Window</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>emro</SetOptStat>
+                <Title>GEM location in CLCT tagged match window</Title>
+                <Type>h1</Type>
+                <XBins>16</XBins>
+                <XMax>16</XMax>
+                <XMin>0</XMin>
+                <XTitle>gem_clct_win</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_CLCT_Match_Window</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <SetXLabels>1='gemA_1'|2='gemA_2'|3='gemB_1'|4='gemB_2'|</SetXLabels>
+                <Title>GEM Enabled Fibers Status</Title>
+                <Type>h1</Type>
+                <XBins>4</XBins>
+                <XMax>4</XMax>
+                <XMin>0</XMin>
+                <XTitle>fibers</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_Fibers_Status</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>hist</SetOption>
+                <SetOptStat>eom</SetOptStat>
+                <Title>Number of GEM PadCluster digis per event</Title>
+                <Type>h1</Type>
+                <XBins>32</XBins>
+                <XMax>32</XMax>
+                <XMin>0</XMin>
+                <XTitle># GEM Pad cluster digis per event</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_Num_Clusters</Name>
+        </Histogram>      
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLogy>1</SetLogy>
+                <SetOption>hist</SetOption>
+                <SetOptStat>emro</SetOptStat>
+                <Title>gemA PadCluster size</Title>
+                <Type>h1</Type>
+                <XBins>8</XBins>
+                <XMax>9</XMax>
+                <XMin>1</XMin>
+                <XTitle>Pad cluster size</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_gemA_Cluster_Size</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLogy>1</SetLogy>
+                <SetOption>hist</SetOption>
+                <SetOptStat>emro</SetOptStat>
+                <Title>gemB PadCluster size</Title>
+                <Type>h1</Type>
+                <XBins>8</XBins>
+                <XMax>9</XMax>
+                <XMin>1</XMin>
+                <XTitle>Pad cluster size</XTitle>
+                <YTitle>Number of events</YTitle>
+                <Name>GEM_gemB_Cluster_Size</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLogy>1</SetLogy>
+                <SetOption>hist</SetOption>
+                <SetOptStat>eo</SetOptStat>
+                <Title>gemA Pads hits</Title>
+                <Type>h1</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad# (0-1535)</XTitle>
+                <YTitle># Hits</YTitle>
+                <Name>GEM_gemA_Hits</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetLogy>1</SetLogy>
+                <SetOption>hist</SetOption>
+                <SetOptStat>eo</SetOptStat>
+                <Title>gemB Pads hits</Title>
+                <Type>h1</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad# (0-1535)</XTitle>
+                <YTitle># Hits</YTitle>
+                <Name>GEM_gemB_Hits</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemA etaRoll/Pads hits</Title>
+                <Type>h2</Type>
+                <XBins>192</XBins>
+                <XMax>192</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>8</YBins>
+                <YMax>8</YMax>
+                <YMin>0</YMin>
+                <YTitle>etaRoll</YTitle>
+                <Name>GEM_gemA_Hits_w_Rolls</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemB etaRoll/Pads hits</Title>
+                <Type>h2</Type>
+                <XBins>192</XBins>
+                <XMax>192</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>8</YBins>
+                <YMax>8</YMax>
+                <YMin>0</YMin>
+                <YTitle>etaRoll</YTitle>
+                <Name>GEM_gemB_Hits_w_Rolls</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemA Pads hits in Time</Title>
+                <Type>h2</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>16</YBins>
+                <YMax>16</YMax>
+                <YMin>0</YMin>
+                <YTitle>Time Bin</YTitle>
+                <Name>GEM_gemA_Hits_in_Time</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemB Pads hits in Time</Title>
+                <Type>h2</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>16</YBins>
+                <YMax>16</YMax>
+                <YMin>0</YMin>
+                <YTitle>Time Bin</YTitle>
+                <Name>GEM_gemB_Hits_in_Time</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>E1</SetOption>
+                <SetOptStat>emr</SetOptStat>
+                <Title>Average gemA Pads hits in Time</Title>
+                <Type>hp</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YTitle>Average Time Bin</YTitle>
+                <Name>GEM_gemA_Hits_in_Time_profile</Name>
+        </Histogram>
+
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>E1</SetOption>
+                <SetOptStat>emr</SetOptStat>
+                <Title>Average gemB Pads hits in Time</Title>
+                <Type>hp</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YTitle>Average Time Bin</YTitle>
+                <Name>GEM_gemB_Hits_in_Time_profile</Name>
+        </Histogram>
+       
+        <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemA Pads hits cluster size</Title>
+                <Type>h2</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>8</YBins>
+                <YMax>9</YMax>
+                <YMin>1</YMin>
+                <YTitle>Cluster Size</YTitle>
+                <Name>GEM_gemA_Pads_Cluster_Size</Name>
+        </Histogram>
+
+                <Histogram>
+                <Folder>TMB</Folder>
+                <Prefix>CSC</Prefix>
+                <SetOption>colz</SetOption>
+                <SetOptStat>e</SetOptStat>
+                <Title>gemB Pads hits cluster size</Title>
+                <Type>h2</Type>
+                <XBins>1536</XBins>
+                <XMax>1536</XMax>
+                <XMin>0</XMin>
+                <XTitle>Pad#</XTitle>
+                <YBins>8</YBins>
+                <YMax>9</YMax>
+                <YMin>1</YMin>
+                <YTitle>Cluster Size</YTitle>
+                <Name>GEM_gemB_Pads_Cluster_Size</Name>
+        </Histogram>
+        
+
 
 </Booking>

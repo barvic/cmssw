@@ -14,6 +14,7 @@ public:
 
   // std::vector<int> BXN() const;
   std::vector<GEMPadDigiCluster> digis(int gem_chamber) const;
+  std::vector<GEMPadDigiCluster> etaDigis(int gem_chamber, int eta) const;
   int sizeInWords() { return size_; }
   int numGEMs() {
     return 2;  // !!! TODO actual number of GEM chambers in readout

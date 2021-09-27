@@ -425,6 +425,8 @@ namespace h {
   HIST_ID(CSC_CLCTXX_KEY_EIGHTSTRIP)                            \
   HIST_ID(CSC_CLCTXX_KEY_STRIP_TYPE)                            \
   HIST_ID(CSC_CLCTXX_COMPARATOR_CODE)                           \
+  HIST_ID(CSC_CLCTXX_RUN3_TO_RUN2_PATTERN)                      \
+  HIST_ID(CSC_CLCTXX_RUN3_BEND_VS_SLOPE)                        \
   HIST_ID(CSC_CLCT_RUN3_HMT_NHITS)                              \
   HIST_ID(CSC_CORR_LCTXX_HITS_DISTRIBUTION)                     \
   HIST_ID(CSC_CORR_LCTXX_KEY_WG)                                \
@@ -432,9 +434,9 @@ namespace h {
   HIST_ID(CSC_CORR_LCTXX_KEY_QUARTSTRIP)                        \
   HIST_ID(CSC_CORR_LCTXX_KEY_EIGHTSTRIP)                        \
   HIST_ID(CSC_CORR_LCTXX_KEY_STRIP_TYPE)                        \
-  HIST_ID(CSC_CORR_LCT_RUN3_HMT_DISTRIBUTION)                   \
   HIST_ID(CSC_CORR_LCT_RUN3_PATTERN_ID)                         \
   HIST_ID(CSC_CORR_LCTXX_RUN3_ME11_QUALITY)                     \
+  HIST_ID(CSC_CORR_LCTXX_RUN3_QUALITY)                          \
   HIST_ID(CSC_CORR_LCT_CLCT_COMBINATION)                        \
   HIST_ID(CSC_CORR_LCTXX_BEND_VS_SLOPE)                         \
   HIST_ID(CSC_CORR_LCT0_VS_LCT1_RUN3_PATTERN)                   \
@@ -444,8 +446,29 @@ namespace h {
   HIST_ID(CSC_CORR_LCT0_VS_ALCT0_KEY_WG)                        \
   HIST_ID(CSC_CORR_LCT1_VS_ALCT1_KEY_WG)                        \
   HIST_ID(CSC_CORR_LCT_VS_ALCT_DIGI_MATCH)                      \
+  HIST_ID(CSC_RUN3_HMT_DISTRIBUTION)                            \
+  HIST_ID(CSC_RUN3_HMT_HADRONIC_SHOWER)                         \
+  HIST_ID(CSC_RUN3_HMT_COINCIDENCE_MATCH)                       \
+  HIST_ID(CSC_RUN3_HMT_ALCT_MATCH)                              \
   HIST_ID(CSC_GEM_SYNC_STATUS)                                  \
-  HIST_ID(CSC_GEM_COPAD_MATCH)
+  HIST_ID(CSC_GEM_LCT_SYNC_STATUS)                              \
+  HIST_ID(CSC_GEM_NUM_COPADS)                                   \
+  HIST_ID(CSC_GEM_ALCT_MATCH)                                   \
+  HIST_ID(CSC_GEM_CLCT_MATCH)                                   \
+  HIST_ID(CSC_GEM_FIBERS_STATUS)                                \
+  HIST_ID(CSC_GEM_NUM_CLUSTERS)                                 \
+  HIST_ID(CSC_GEM_GEMA_CLUSTER_SIZE)                            \
+  HIST_ID(CSC_GEM_GEMB_CLUSTER_SIZE)                            \
+  HIST_ID(CSC_GEM_GEMA_HITS)                                    \
+  HIST_ID(CSC_GEM_GEMB_HITS)                                    \
+  HIST_ID(CSC_GEM_GEMA_HITS_W_ROLLS)                            \
+  HIST_ID(CSC_GEM_GEMB_HITS_W_ROLLS)                            \
+  HIST_ID(CSC_GEM_GEMA_HITS_IN_TIME)                            \
+  HIST_ID(CSC_GEM_GEMB_HITS_IN_TIME)                            \
+  HIST_ID(CSC_GEM_GEMA_HITS_IN_TIME_PROFILE)                    \
+  HIST_ID(CSC_GEM_GEMB_HITS_IN_TIME_PROFILE)                    \
+  HIST_ID(CSC_GEM_GEMA_PADS_CLUSTER_SIZE)                       \
+  HIST_ID(CSC_GEM_GEMB_PADS_CLUSTER_SIZE)
 
 #define HIST_NAME_TABLE                                         \
   HIST_NAME("Actual_DMB_CFEB_DAV_Frequency")                    \
@@ -842,6 +865,8 @@ namespace h {
   HIST_NAME("CLCT%d_KeyEightStrip")                             \
   HIST_NAME("CLCT%d_KeyStripType")                              \
   HIST_NAME("CLCT%d_ComparatorCode")                            \
+  HIST_NAME("CLCT%d_Run3_to_Run2_Pattern")                      \
+  HIST_NAME("CLCT%d_Run3_Bend_vs_Slope")                        \
   HIST_NAME("CLCT_Run3_HMT_nhits")                              \
   HIST_NAME("Corr_LCT%d_Hits_Distribution")                     \
   HIST_NAME("Corr_LCT%d_KeyWG")                                 \
@@ -849,9 +874,9 @@ namespace h {
   HIST_NAME("Corr_LCT%d_KeyQuartStrip")                         \
   HIST_NAME("Corr_LCT%d_KeyEightStrip")                         \
   HIST_NAME("Corr_LCT%d_KeyStripType")                          \
-  HIST_NAME("Corr_LCT_Run3_HMT_Distribution")                   \
   HIST_NAME("Corr_LCT_Run3_PatternID")                          \
   HIST_NAME("Corr_LCT%d_Run3_ME11_Quality")                     \
+  HIST_NAME("Corr_LCT%d_Run3_Quality")                          \
   HIST_NAME("Corr_LCT_CLCT_Combination")                        \
   HIST_NAME("Corr_LCT%d_Bend_vs_Slope")                         \
   HIST_NAME("Corr_LCT0_vs_LCT1_Run3_Patterns")                  \
@@ -861,8 +886,29 @@ namespace h {
   HIST_NAME("Corr_LCT0_vs_ALCT0_KeyWG")                         \
   HIST_NAME("Corr_LCT1_vs_ALCT1_KeyWG")                         \
   HIST_NAME("Corr_LCT_vs_ALCT_Digi_Match")                      \
+  HIST_NAME("Run3_HMT_Distribution")                            \
+  HIST_NAME("Run3_HMT_HadronicShowerTrigger")                   \
+  HIST_NAME("Run3_HMT_Coincidence_Match")                       \
+  HIST_NAME("Run3_HMT_ALCT_Match")                              \
   HIST_NAME("GEM_Sync_Status")                                  \
-  HIST_NAME("GEM_Copad_Match")
+  HIST_NAME("GEM_LCT_Sync_Status")                              \
+  HIST_NAME("GEM_Num_Copads")                                   \
+  HIST_NAME("GEM_ALCT_Match_Window")                            \
+  HIST_NAME("GEM_CLCT_Match_Window")                            \
+  HIST_NAME("GEM_Fibers_Status")                                \
+  HIST_NAME("GEM_Num_Clusters")                                 \
+  HIST_NAME("GEM_gemA_Cluster_Size")                            \
+  HIST_NAME("GEM_gemB_Cluster_Size")                            \
+  HIST_NAME("GEM_gemA_Hits")                                    \
+  HIST_NAME("GEM_gemB_Hits")                                    \
+  HIST_NAME("GEM_gemA_Hits_w_Rolls")                            \
+  HIST_NAME("GEM_gemB_Hits_w_Rolls")                            \
+  HIST_NAME("GEM_gemA_Hits_in_Time")                            \
+  HIST_NAME("GEM_gemB_Hits_in_Time")                            \
+  HIST_NAME("GEM_gemA_Hits_in_Time_Profile")                    \
+  HIST_NAME("GEM_gemB_Hits_in_Time_Profile")                    \
+  HIST_NAME("GEM_gemA_Pads_Cluster_Size")                       \
+  HIST_NAME("GEM_gemB_Pads_Cluster_Size")
 
 #define HIST_ID(a) a,
   enum HistoId { HIST_ID_TABLE };

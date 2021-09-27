@@ -195,9 +195,9 @@ int CSCTMBData::UnpackTMB(const uint16_t* buf) {
 
     if (isGEMfirmware) {
       GEMFibersMask = buf[b0cLine + 36] & 0xf;  // GEM enabled fibers 4-bits mask
-      for (int i = 0; i < 4; i++)
-        NGEMEnabled += (buf[b0cLine + 36] >> i) & 0x1;  // Get number of enabled GEM fibers
-      // NGEMEnabled = 2;
+      // for (int i = 0; i < 4; i++)
+      //  NGEMEnabled += (buf[b0cLine + 36] >> i) & 0x1;  // Get number of enabled GEM fibers
+      NGEMEnabled = 4;                              // Currently always assume that all 4 fibers are enabled
       NGEMtbins = (buf[b0cLine + 36] >> 5) & 0x1F;  // Get GEM tbins
     }
     //    } else {

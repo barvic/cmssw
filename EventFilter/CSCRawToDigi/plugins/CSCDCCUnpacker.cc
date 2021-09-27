@@ -553,6 +553,14 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               } else
                 clctProduct->move(std::make_pair(clctDigis.begin(), clctDigis.end()), layer);
 
+              /// fill Run3 HMT Shower digi
+              CSCShowerDigi showerDigi = cscData[iCSC].tmbHeader()->ShowerDigi(layer.rawId());
+              if (showerDigi.isValid()) {
+                std::vector<CSCShowerDigi> showerDigis;
+                showerDigis.push_back(showerDigi);
+                showerProduct->move(std::make_pair(showerDigis.begin(), showerDigis.end()), layer);
+              }
+
               /// fill CSC-RPC or CSC-GEMs digis
               if (cscData[iCSC].tmbData()->checkSize()) {
                 if (cscData[iCSC].tmbData()->hasRPC()) {
@@ -566,12 +574,17 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                     /// !!! TODO: Needs mapping for CSCDetId to GEMDetId
                     int gem_chamber = layer.chamber();
                     int gem_region = (layer.endcap() == 1) ? 1 : -1;
-                    if (b904Setup) {
-                      GEMDetId gemid(
-                          gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, 0);  /// Dummy id for b904
-                      std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->digis(igem);
-                      gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
+                    // if (b904Setup) {
+                    for (unsigned ieta = 0; ieta < 8; ieta++) {
+                      GEMDetId gemid(gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, ieta);
+                      //    gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, 0);  /// Dummy id for b904
+                      // std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->digis(igem);
+                      std::vector<GEMPadDigiCluster> gemDigis =
+                          cscData[iCSC].tmbData()->gemData()->etaDigis(igem, ieta);
+                      if (gemDigis.size() > 0)
+                        gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
                     }
+                    // }
                   }
                 }
               } else

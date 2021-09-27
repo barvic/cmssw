@@ -976,25 +976,34 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
                */
         if ((TMB_Firmware_Revision >= 0x50c3) || (TMB_Firmware_Revision < 0x42D5)) {
           bool isGEMfirmware = false;
+          // bool isGEMfirmware_rev0 = false;
           if (TMB_Firmware_Revision < 0x4000) { /* New TMB firmware revision format */
             /* Data Format Version codes 
              * 0=TMB
              * 1=OTMB standard 
-             * 2=OTMB+GEM data
-             * 3=Modified LCT data Format
+             * 2=OTMB+CCLUT+HMT Run3 data format
+             * 3=OTMB+CCLUT+HMT+GEM Run3 data format
              */
-            if (((TMB_Firmware_Revision >> 9) & 0x2) == 0x2)
+            if (((TMB_Firmware_Revision >> 9) & 0x3) == 0x3)
               isGEMfirmware = true;
+            // if (TMB_Firmware_Revision == 0x600)
+            // isGEMfirmware_rev0 = true;
           }
 
           if (isGEMfirmware) {
             uint16_t Enabled_GEMs = 0;
+            /* GEM output format, based on the number of enabled fibers, not yet implemented in the firmware */
+            /*
             for (int i = 0; i < 4; i++)
               Enabled_GEMs += (buf_1[0] >> i) & 0x1;
+             */
+            Enabled_GEMs = 4;  // Currently always assume that all 4 fibers are enabled
             // Number of enabled GEM Fibers * nTimebins
             TMB_WordsGEM = Enabled_GEMs * ((buf_1[0] >> 5) & 0x1F) * 4;
             TMB_WordsGEM += 2;  // add header/trailer for block of GEM raw hits
-          }
+
+            // TMB_WordsRPC = ((buf_1[0]&0x0010) >> 4) * ((buf_1[0]&0x000c) >> 2) * ((buf_1[0]>>5) & 0x1F) * 2;
+          }  // else
           {
             // On/off * nRPCs * nTimebins * 2 words/RPC/bin
             TMB_WordsRPC = ((buf_1[0] & 0x0010) >> 4) * ((buf_1[0] & 0x000c) >> 2) * ((buf_1[0] >> 5) & 0x1F) * 2;
@@ -1007,7 +1016,9 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
       {
         TMB_WordsRPC = ((buf_1[2] & 0x0040) >> 6) * ((buf_1[2] & 0x0030) >> 4) * TMB_Tbins * 2;
       }
-      TMB_WordsRPC += 2;  // add header/trailer for block of RPC raw hits
+      /// Assume that for OTMB2020 firmware RPC would be disabled in the readout, so add 2 words for RPC header/trailer only if RPC is enabled
+      if (TMB_WordsRPC > 0)
+        TMB_WordsRPC += 2;  // add header/trailer for block of RPC raw hits
     }
 
     // Check for RPC data
@@ -1162,7 +1173,7 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
 
     // == CFEB Sample Trailer found
 
-    if (((buf0[1] & 0xF000) == 0x7000) && ((buf0[2] & 0xF000) == 0x7000) &&
+    if (!fTMB_Header && ((buf0[1] & 0xF000) == 0x7000) && ((buf0[2] & 0xF000) == 0x7000) &&
         ((buf0[1] != 0x7FFF) || (buf0[2] != 0x7FFF)) &&
         (((buf0[3] & 0xFFFF) == 0x7FFF) ||                                 // old format
          ((buf0[3] & buf0[0]) == 0x0000 && (buf0[3] + buf0[0]) == 0x7FFF)  // 2007 format
@@ -1214,7 +1225,7 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
     }
 
     // == CFEB B-word found
-    if ((buf0[0] & 0xF000) == 0xB000 && (buf0[1] & 0xF000) == 0xB000 && (buf0[2] & 0xF000) == 0xB000 &&
+    if (!fTMB_Header && (buf0[0] & 0xF000) == 0xB000 && (buf0[1] & 0xF000) == 0xB000 && (buf0[2] & 0xF000) == 0xB000 &&
         (buf0[3] & 0xF000) == 0xB000) {
       bCHAMB_STATUS[currentChamber] |= 0x400000;
 
