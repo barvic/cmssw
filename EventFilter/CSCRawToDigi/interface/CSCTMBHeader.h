@@ -23,7 +23,7 @@ struct CSCTMBHeader2006;
 struct CSCTMBHeader2007;
 struct CSCTMBHeader2007_rev0x50c3;
 struct CSCTMBHeader2013;
-struct CSCTMBHeader2020;
+struct CSCTMBHeader2020_TMB;
 struct CSCTMBHeader2020_CCLUT;
 struct CSCTMBHeader2020_GEM;
 struct CSCTMBHeader2020_Run2;
@@ -59,7 +59,7 @@ public:
   CSCTMBHeader2007_rev0x50c3 tmbHeader2007_rev0x50c3() const;
   CSCTMBHeader2006 tmbHeader2006() const;
   CSCTMBHeader2013 tmbHeader2013() const;
-  CSCTMBHeader2020 tmbHeader2020() const;
+  CSCTMBHeader2020_TMB tmbHeader2020_TMB() const;
   CSCTMBHeader2020_CCLUT tmbHeader2020_CCLUT() const;
   CSCTMBHeader2020_GEM tmbHeader2020_GEM() const;
   CSCTMBHeader2020_Run2 tmbHeader2020_Run2() const;

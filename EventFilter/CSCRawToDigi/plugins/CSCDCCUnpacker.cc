@@ -84,6 +84,9 @@ private:
   bool debug, printEventNumber, goodEvent, useExaminer, unpackStatusDigis;
   bool useSelectiveUnpacking, useFormatStatus;
 
+  /// option to unpack RPC data
+  bool useRPCs_;
+
   /// option to unpack GEM cluster data
   bool useGEMs_;
 
@@ -124,6 +127,7 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   /// Enable Format Status Digis
   useFormatStatus = pset.getParameter<bool>("UseFormatStatus");
 
+  useRPCs_ = pset.getParameter<bool>("useRPCs");
   useGEMs_ = pset.getParameter<bool>("useGEMs");
   useCSCShowers_ = pset.getParameter<bool>("useCSCShowers");
 
@@ -154,7 +158,7 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   produces<CSCComparatorDigiCollection>("MuonCSCComparatorDigi");
   produces<CSCALCTDigiCollection>("MuonCSCALCTDigi");
   produces<CSCCLCTDigiCollection>("MuonCSCCLCTDigi");
-  produces<CSCRPCDigiCollection>("MuonCSCRPCDigi");
+  // produces<CSCRPCDigiCollection>("MuonCSCRPCDigi");
   produces<CSCCorrelatedLCTDigiCollection>("MuonCSCCorrelatedLCTDigi");
 
   if (unpackStatusDigis) {
@@ -168,6 +172,10 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
 
   if (useFormatStatus) {
     produces<CSCDCCFormatStatusDigiCollection>("MuonCSCDCCFormatStatusDigi");
+  }
+
+  if (useRPCs_) {
+    produces<CSCRPCDigiCollection>("MuonCSCRPCDigi");
   }
 
   if (useGEMs_) {
@@ -206,6 +214,7 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.add<unsigned int>("ErrorMask", 0)->setComment("# This mask simply reduces error reporting");
   desc.add<bool>("UnpackStatusDigis", false)->setComment("# Unpack general status digis?");
   desc.add<bool>("UseFormatStatus", true)->setComment("# Unpack FormatStatus digi?");
+  desc.add<bool>("useRPCs", false)->setComment("Unpack RPC data");
   desc.add<bool>("useGEMs", false)->setComment("Unpack GEM trigger data");
   desc.add<bool>("useCSCShowers", false)->setComment("Unpack CSCShower trigger data");
   desc.addUntracked<bool>("Debug", false)->setComment("# Turn on lots of output");
@@ -554,21 +563,24 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                 clctProduct->move(std::make_pair(clctDigis.begin(), clctDigis.end()), layer);
 
               /// fill Run3 HMT Shower digi
-              CSCShowerDigi showerDigi = cscData[iCSC].tmbHeader()->ShowerDigi(layer.rawId());
-              if (showerDigi.isValid()) {
-                std::vector<CSCShowerDigi> showerDigis;
-                showerDigis.push_back(showerDigi);
-                showerProduct->move(std::make_pair(showerDigis.begin(), showerDigis.end()), layer);
+              if (useCSCShowers_) {
+                CSCShowerDigi showerDigi = cscData[iCSC].tmbHeader()->ShowerDigi(layer.rawId());
+                if (showerDigi.isValid()) {
+                  std::vector<CSCShowerDigi> showerDigis;
+                  showerDigis.push_back(showerDigi);
+                  showerProduct->move(std::make_pair(showerDigis.begin(), showerDigis.end()), layer);
+                }
               }
 
               /// fill CSC-RPC or CSC-GEMs digis
               if (cscData[iCSC].tmbData()->checkSize()) {
-                if (cscData[iCSC].tmbData()->hasRPC()) {
+                if (useRPCs_ && cscData[iCSC].tmbData()->hasRPC()) {
                   std::vector<CSCRPCDigi> rpcDigis = cscData[iCSC].tmbData()->rpcData()->digis();
                   rpcProduct->move(std::make_pair(rpcDigis.begin(), rpcDigis.end()), layer);
                 }
 
-                if (cscData[iCSC].tmbData()->hasGEM()) {
+                /// fill CSC-GEM GEMPadCluster digis
+                if (useGEMs_ && cscData[iCSC].tmbData()->hasGEM()) {
                   for (int unsigned igem = 0; igem < (int unsigned)(cscData[iCSC].tmbData()->gemData()->numGEMs());
                        ++igem) {
                     /// !!! TODO: Needs mapping for CSCDetId to GEMDetId
@@ -674,7 +686,7 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
   e.put(std::move(alctProduct), "MuonCSCALCTDigi");
   e.put(std::move(clctProduct), "MuonCSCCLCTDigi");
   e.put(std::move(comparatorProduct), "MuonCSCComparatorDigi");
-  e.put(std::move(rpcProduct), "MuonCSCRPCDigi");
+  // e.put(std::move(rpcProduct), "MuonCSCRPCDigi");
   e.put(std::move(corrlctProduct), "MuonCSCCorrelatedLCTDigi");
 
   if (useFormatStatus)
@@ -687,6 +699,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
     e.put(std::move(dduStatusProduct), "MuonCSCDDUStatusDigi");
     e.put(std::move(dccStatusProduct), "MuonCSCDCCStatusDigi");
     e.put(std::move(alctStatusProduct), "MuonCSCALCTStatusDigi");
+  }
+
+  if (useRPCs_) {
+    e.put(std::move(rpcProduct), "MuonCSCRPCDigi");
   }
   if (useGEMs_) {
     e.put(std::move(gemProduct), "MuonGEMPadDigiCluster");
