@@ -35,7 +35,7 @@ struct CSCTMBHeader2020_rev0 : public CSCVTMBHeaderFormat {
     return ((bits.hmt_nhits_bit0 & 0x1) + ((bits.hmt_nhits_bit1 & 0x1) << 1) +
             ((bits.hmt_nhits_bits_high & 0x1F) << 2));
   }
-  uint16_t HMT_ALCTMatchTime() const { return 0; }
+  uint16_t HMT_ALCTMatchTime() const override { return 0; }
   // uint16_t HMT_nhits() const {return 0;}
   uint16_t GEM_enabled_fibers() const override { return (bits.gem_enabled_fibers & 0xF); }
   uint16_t GEM_fifo_tbins() const override { return bits.fifo_tbins_gem; }

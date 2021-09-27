@@ -32,7 +32,7 @@ struct CSCTMBHeader2007_rev0x50c3 : public CSCVTMBHeaderFormat {
   uint16_t CLCT0_xky() const override { return 0; }
   uint16_t CLCT1_xky() const override { return 0; }
   uint16_t HMT_nhits() const override { return 0; }
-  uint16_t HMT_ALCTMatchTime() const { return 0; }
+  uint16_t HMT_ALCTMatchTime() const override { return 0; }
   uint16_t GEM_enabled_fibers() const override { return 0; }
   uint16_t GEM_fifo_tbins() const override { return 0; }
   uint16_t GEM_fifo_pretrig() const override { return 0; }

@@ -594,7 +594,7 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                       // std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->digis(igem);
                       std::vector<GEMPadDigiCluster> gemDigis =
                           cscData[iCSC].tmbData()->gemData()->etaDigis(igem, ieta);
-                      if (gemDigis.size() > 0)
+                      if (!gemDigis.empty())
                         gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
                     }
                     // }

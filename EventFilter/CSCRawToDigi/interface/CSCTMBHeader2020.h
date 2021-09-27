@@ -35,7 +35,7 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
     return ((bits.hmt_nhits_bit0 & 0x1) + ((bits.hmt_nhits_bit1 & 0x1) << 1) +
             ((bits.hmt_nhits_bits_high & 0x1F) << 2));
   }
-  uint16_t HMT_ALCTMatchTime() const { return 0; }
+  uint16_t HMT_ALCTMatchTime() const override { return 0; }
   uint16_t GEM_enabled_fibers() const override { return (bits.gem_enabled_fibers & 0xF); }
   uint16_t GEM_fifo_tbins() const override { return bits.fifo_tbins_gem; }
   uint16_t GEM_fifo_pretrig() const override { return bits.fifo_pretrig_gem; }
@@ -48,7 +48,7 @@ struct CSCTMBHeader2020 : public CSCVTMBHeaderFormat {
     return ((bits.gem_delay & 0xFF) + ((bits.gem_clct_win & 0xF) << 8) + ((bits.alct_gem_win & 0x7) << 12));
   }
 
-  virtual uint16_t Run3_CLCT_patternID() const override {
+  uint16_t Run3_CLCT_patternID() const override {
     return (bits.MPC_Muon_clct_pattern_low | (bits.MPC_Muon_clct_pattern_bit5 << 4));
   }
   // ==

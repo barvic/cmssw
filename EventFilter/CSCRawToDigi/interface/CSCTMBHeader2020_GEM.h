@@ -35,7 +35,7 @@ struct CSCTMBHeader2020_GEM : public CSCVTMBHeaderFormat {
     return ((bits.hmt_nhits_bit0 & 0x1) + ((bits.hmt_nhits_bit1 & 0x1) << 1) +
             ((bits.hmt_nhits_bits_high & 0x1F) << 2));
   }
-  uint16_t HMT_ALCTMatchTime() const { return bits.hmt_match_win; }
+  uint16_t HMT_ALCTMatchTime() const override { return bits.hmt_match_win; }
   // uint16_t HMT_nhits() const {return 0;}
   uint16_t GEM_enabled_fibers() const override { return (bits.gem_enabled_fibers & 0xF); }
   uint16_t GEM_fifo_tbins() const override { return bits.fifo_tbins_gem; }
@@ -71,7 +71,7 @@ struct CSCTMBHeader2020_GEM : public CSCVTMBHeaderFormat {
   unsigned short int NHeaderFrames() const override { return bits.nHeaderFrames; }
   /// returns the first data word
   unsigned short* data() override { return (unsigned short*)(&bits); }
-  bool check() const { return bits.e0bline == 0x6e0b; }
+  bool check() const override { return bits.e0bline == 0x6e0b; }
 
   /// Needed before data packing
   //void setChamberId(const CSCDetId & detId) {theChamberId = detId;}

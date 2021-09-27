@@ -306,7 +306,7 @@ CSCTMBHeader2020_TMB CSCTMBHeader::tmbHeader2020_TMB() const {
 
 CSCTMBHeader2020_CCLUT CSCTMBHeader::tmbHeader2020_CCLUT() const {
   CSCTMBHeader2020_CCLUT *result = dynamic_cast<CSCTMBHeader2020_CCLUT *>(theHeaderFormat.get());
-  if (result == 0) {
+  if (result == nullptr) {
     throw cms::Exception("Could not get 2020 (O)TMB CCLUT header format");
   }
   return *result;
@@ -314,7 +314,7 @@ CSCTMBHeader2020_CCLUT CSCTMBHeader::tmbHeader2020_CCLUT() const {
 
 CSCTMBHeader2020_GEM CSCTMBHeader::tmbHeader2020_GEM() const {
   CSCTMBHeader2020_GEM *result = dynamic_cast<CSCTMBHeader2020_GEM *>(theHeaderFormat.get());
-  if (result == 0) {
+  if (result == nullptr) {
     throw cms::Exception("Could not get 2020 (O)TMB GEM header format");
   }
   return *result;
@@ -322,7 +322,7 @@ CSCTMBHeader2020_GEM CSCTMBHeader::tmbHeader2020_GEM() const {
 
 CSCTMBHeader2020_Run2 CSCTMBHeader::tmbHeader2020_Run2() const {
   CSCTMBHeader2020_Run2 *result = dynamic_cast<CSCTMBHeader2020_Run2 *>(theHeaderFormat.get());
-  if (result == 0) {
+  if (result == nullptr) {
     throw cms::Exception("Could not get 2020 (O)TMB legacy Run2 header format");
   }
   return *result;
@@ -330,7 +330,7 @@ CSCTMBHeader2020_Run2 CSCTMBHeader::tmbHeader2020_Run2() const {
 
 CSCTMBHeader2020_rev0 CSCTMBHeader::tmbHeader2020_rev0() const {
   CSCTMBHeader2020_rev0 *result = dynamic_cast<CSCTMBHeader2020_rev0 *>(theHeaderFormat.get());
-  if (result == 0) {
+  if (result == nullptr) {
     throw cms::Exception("Could not get 2020 (O)TMB initial rev0 CCLUT/GEM header format");
   }
   return *result;

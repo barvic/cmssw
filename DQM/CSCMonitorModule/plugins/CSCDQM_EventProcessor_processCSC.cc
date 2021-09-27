@@ -903,7 +903,7 @@ namespace cscdqm {
 
                 if (tmbData->hasGEM()) {
                   CSCGEMData* gemData = tmbData->gemData();
-                  if (gemData != NULL) {
+                  if (gemData != nullptr) {
                     bool isGEM_hits_found = false;
                     std::vector<CSCCorrelatedLCTDigi> corr_lctsDatasTmp = tmbHeader->CorrelatedLCTDigis(cid.rawId());
                     // bool isLCT0matched = (((gem_sync_status)&0x6) > 0) ? true : false;
@@ -915,7 +915,7 @@ namespace cscdqm {
                         mo->Fill(gemDigis.size());
                       }
 
-                      if (gemDigis.size() > 0) {
+                      if (!gemDigis.empty()) {
                         isGEM_hits_found = true;
                         for (unsigned digi = 0; digi < gemDigis.size(); digi++) {
                           if (gemDigis[digi].isValid()) {
@@ -927,7 +927,7 @@ namespace cscdqm {
                                             mo)) {
                               mo->Fill(pads_hits.size());
                             }
-                            if (pads_hits.size()) {
+                            if (!pads_hits.empty()) {
                               if (getCSCHisto(((i == 0) ? h::CSC_GEM_GEMA_PADS_CLUSTER_SIZE
                                                         : h::CSC_GEM_GEMB_PADS_CLUSTER_SIZE),
                                               crateID,
@@ -984,7 +984,7 @@ namespace cscdqm {
                       }
                       for (unsigned ieta = 0; ieta < 8; ieta++) {
                         std::vector<GEMPadDigiCluster> gemEtaDigis = gemData->etaDigis(i, ieta);
-                        if (gemEtaDigis.size() > 0) {
+                        if (!gemEtaDigis.empty()) {
                           for (unsigned digi = 0; digi < gemEtaDigis.size(); digi++) {
                             if (gemEtaDigis[digi].isValid()) {
                               std::vector<uint16_t> pads_hits = gemEtaDigis[digi].pads();
@@ -1132,7 +1132,7 @@ namespace cscdqm {
                 if (getCSCHisto(h::CSC_RUN3_HMT_COINCIDENCE_MATCH, crateID, dmbID, mo)) {
                   if ((corr_lctsDatasTmp[lct].getHMT() > 0) && (corr_lctsDatasTmp[lct].getHMT() <= 0xF)) {
                     mo->Fill(0);  // Run3 HMT is fired
-                    if ((clctsDatasTmp.size() > 0) && clctsDatasTmp[lct].isValid()) {
+                    if ((!clctsDatasTmp.empty()) && clctsDatasTmp[lct].isValid()) {
                       mo->Fill(2);  // Run3 HMT+CLCT match
                     }
                     if (corr_lctsDatasTmp[lct].isValid()) {
@@ -1163,7 +1163,7 @@ namespace cscdqm {
             mo->Fill(clctsDatasTmp[1].getKeyStrip(), corr_lctsDatasTmp[1].getStrip());
           }
 
-          if (corr_lctsDatas.size() > 0) {
+          if (!corr_lctsDatas.empty()) {
             if (corr_lctsDatasTmp[0].isRun3()) {
               if (getCSCHisto(h::CSC_CORR_LCT0_VS_LCT1_RUN3_PATTERN, crateID, dmbID, mo)) {
                 int lct1_pattern = corr_lctsDatasTmp[1].getRun3Pattern();
@@ -1257,7 +1257,7 @@ namespace cscdqm {
                 }
               }
 
-              if (alctsDatas.size() && getCSCHisto(h::CSC_RUN3_HMT_COINCIDENCE_MATCH, crateID, dmbID, mo) &&
+              if (!alctsDatas.empty() && getCSCHisto(h::CSC_RUN3_HMT_COINCIDENCE_MATCH, crateID, dmbID, mo) &&
                   corr_lctsDatasTmp[0].isRun3() && (corr_lctsDatasTmp[0].getHMT() > 0) &&
                   (corr_lctsDatasTmp[0].getHMT() <= 0xF) && alctsDatas[0].isValid()) {
                 mo->Fill(1);  // Run3 HMT+ALCT match
