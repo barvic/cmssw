@@ -352,9 +352,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
         }
 
         /*
-                   std::cout << "FED" << id << " " << fedData.size() << " " << goodEvent << " "
-              << std::hex << examiner->errors() << std::dec << " " << status << std::endl;
-              */
+        std::cout << "FED" << std::dec << id << " size:" << fedData.size() << " good:" << goodEvent << " errs 0x"
+              << std::hex << examiner->errors() << std::dec << std::endl;
+         */
 
         // Fill Format status digis per FED
         // Remove examiner->errors() != 0 check if we need to put status digis for every event
@@ -478,9 +478,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
             /// Skip chambers (special case of data corruption), which report wrong ID and pose as different chamber
             if (isDDU_FED) {
               unsigned int dduid = cscmapping->ddu(layer);
-              if ((dduid >= 1) && (dduid <= 36))
+              if ((dduid >= 1) && (dduid <= 36)) {
                 dduid = postLS1_map[dduid - 1];  // Fix for Post-LS1 FED/DDU IDs mappings
-              // std::cout << "CSC " << layer << " -> " << id << ":" << dduid << ":" << vmecrate << ":" << dmb ;
+                // std::cout << "CSC " << layer << " -> " << id << ":" << dduid << ":" << vmecrate << ":" << dmb << std::endl;
+              }
 
               /// Do not skip chamber data if mapping check is disabled or b904 setup data file is used
               if ((!disableMappingCheck) && (!b904Setup) && (id != dduid)) {

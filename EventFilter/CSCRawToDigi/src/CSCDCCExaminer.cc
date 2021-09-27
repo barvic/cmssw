@@ -977,7 +977,8 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
         if ((TMB_Firmware_Revision >= 0x50c3) || (TMB_Firmware_Revision < 0x42D5)) {
           bool isGEMfirmware = false;
           // bool isGEMfirmware_rev0 = false;
-          if (TMB_Firmware_Revision < 0x4000) { /* New TMB firmware revision format */
+          if ((TMB_Firmware_Revision < 0x4000) &&
+              (TMB_Firmware_Revision > 0x0)) { /* New TMB firmware revision format */
             /* Data Format Version codes 
              * 0=TMB
              * 1=OTMB standard 
@@ -1017,8 +1018,8 @@ int32_t CSCDCCExaminer::check(const uint16_t*& buffer, int32_t length) {
         TMB_WordsRPC = ((buf_1[2] & 0x0040) >> 6) * ((buf_1[2] & 0x0030) >> 4) * TMB_Tbins * 2;
       }
       /// Assume that for OTMB2020 firmware RPC would be disabled in the readout, so add 2 words for RPC header/trailer only if RPC is enabled
-      if (TMB_WordsRPC > 0)
-        TMB_WordsRPC += 2;  // add header/trailer for block of RPC raw hits
+      // if (TMB_WordsRPC > 0)
+      TMB_WordsRPC += 2;  // add header/trailer for block of RPC raw hits
     }
 
     // Check for RPC data
