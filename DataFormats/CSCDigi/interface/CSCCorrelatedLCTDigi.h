@@ -18,7 +18,7 @@
 
 class CSCCorrelatedLCTDigi {
 public:
-  enum class Version { Legacy = 0, Run3 };
+  enum class Version { Legacy = 0, Run3 = 1, Run3b = 2};
   // for data vs emulator studies
   enum LCTBXMask { kBXDataMask = 0x1 };
 
@@ -53,7 +53,8 @@ public:
                        const uint16_t run3_pattern = 0,
                        const uint16_t run3_slope = 0,
                        const int type = ALCTCLCT,
-                       const uint16_t gemLayerUsedForSlopeComputation = 0);
+                       const uint16_t gemLayerUsedForSlopeComputation = 0,
+		       const uint16_t run3b_slope_extra_bits = 0);
 
   /// default (calls clear())
   CSCCorrelatedLCTDigi();
@@ -205,7 +206,11 @@ public:
   void setHMT(const uint16_t h);
 
   /// Distinguish Run-1/2 from Run-3
-  bool isRun3() const { return version_ == Version::Run3; }
+  bool isRun3() const { return ( version_ == Version::Run3 ) || ( version_ == Version::Run3b ); }
+
+  bool isRun3b() const { return version_ == Version::Run3b; }
+
+  Version getRunVersion() const { return version_; }
 
   void setRun3(const bool isRun3);
 
@@ -215,6 +220,14 @@ public:
 
   uint16_t getGemLayerUsedForSlopeComputation() const { return gemLayerUsedForSlopeComputation_; }
   void setGemLayerUsedForSlopeComputation(uint16_t layer) { gemLayerUsedForSlopeComputation_ = layer; }
+
+  /// set/get Run3-b slope/bend extra precision 2-bits
+  uint16_t getRun3bSlopeExtraBits() const { return run3b_slope_extra_bits_; }
+  void setRun3bSlopeExtraBits(uint16_t extra_bits) { run3b_slope_extra_bits_ = extra_bits; }
+
+  /// set/get Run3-b higher precision 6-bits slope/bend value
+  uint16_t getSlopeRun3b() const { return ((run3_slope_ & 0xF) << 2) + run3b_slope_extra_bits_; }
+  void setSlopeRun3b(const uint16_t slope6bits) { run3_slope_ = (slope6bits >> 2) & 0xF; run3b_slope_extra_bits_ = slope6bits & 0x3; }
 
   void setALCT(const CSCALCTDigi& alct) { alct_ = alct; }
   void setCLCT(const CSCCLCTDigi& clct) { clct_ = clct; }
@@ -274,8 +287,11 @@ private:
   uint16_t run3_pattern_;
   // 4-bit bending value. There will be 16 bending values * 2 (left/right)
   uint16_t run3_slope_;
-  // In Run-3, the GEM information is included in the LCT data format. The "gemLayerUsedForSlopeComputation_" indicates what GEM layer was used to compute the slope.
+  // In Run3-b, the GEM information is included in the LCT data format. The "gemLayerUsedForSlopeComputation_" indicates what GEM layer was used to compute the slope.
   uint16_t gemLayerUsedForSlopeComputation_;
+  // In Run3-b the bending/slope for CSC-GEM readout has extra 2-bits for higher precision. 6-bits Run3b slope/bending value "run3_slope_" * 4 + "run3b_slope_extra_bits_"
+  uint16_t run3b_slope_extra_bits_;
+
 
   /// SIMULATION ONLY ////
   int type_;

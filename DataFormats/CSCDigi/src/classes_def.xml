@@ -11,7 +11,8 @@
    <class name="CSCComparatorDigi" ClassVersion="10">
     <version ClassVersion="10" checksum="656608282"/>
    </class>
-   <class name="CSCCorrelatedLCTDigi" ClassVersion="14">
+   <class name="CSCCorrelatedLCTDigi" ClassVersion="15">
+    <version ClassVersion="15" checksum="3871451586"/>
     <version ClassVersion="14" checksum="1183056062"/>
     <version ClassVersion="13" checksum="537762368"/>
     <version ClassVersion="12" checksum="1516836035"/>
