@@ -1233,7 +1233,7 @@ namespace cscdqm {
           }
 
           for (uint32_t lct = 0; lct < corr_lctsDatas.size(); lct++) {
-		  /*
+            /*
                   LOG_INFO << "CorrelatedLCT Digis dump: "
                             << "CorrLCT" << lct << " isRun3:" << corr_lctsDatasTmp[lct].isRun3()
                             << ", isValid: " << corr_lctsDatasTmp[lct].isValid()

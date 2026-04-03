@@ -25,7 +25,9 @@ CSCTMBHeader2020_GEM_Run3b::CSCTMBHeader2020_GEM_Run3b() {
   bits.gem_enabled_fibers_ = 0xf;
 }
 
-CSCTMBHeader2020_GEM_Run3b::CSCTMBHeader2020_GEM_Run3b(const unsigned short* buf) { memcpy(data(), buf, sizeInWords() * 2); }
+CSCTMBHeader2020_GEM_Run3b::CSCTMBHeader2020_GEM_Run3b(const unsigned short* buf) {
+  memcpy(data(), buf, sizeInWords() * 2);
+}
 
 void CSCTMBHeader2020_GEM_Run3b::setEventInformation(const CSCDMBHeader& dmbHeader) {
   bits.cscID = dmbHeader.dmbID();
@@ -109,12 +111,13 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020_GEM_Run3b::CorrelatedLCTDigis
   /// for the zeroth MPC word:
   unsigned strip = bits.MPC_Muon0_clct_key_halfstrip;  //this goes from 0-223
   unsigned slope = (bits.MPC_Muon0_clct_bend_low & 0x7) | (bits.MPC_Muon0_clct_bend_high << 3);
-  unsigned hmt = bits.MPC_Muon_HMT_bit0 | ((bits.MPC_Muon_HMT_high & 0x3) << 1);  // HighMultiplicityTrigger for (Run3-b 3-bits)
+  unsigned hmt =
+      bits.MPC_Muon_HMT_bit0 | ((bits.MPC_Muon_HMT_high & 0x3) << 1);  // HighMultiplicityTrigger for (Run3-b 3-bits)
   // unsigned clct_pattern_id = bits.MPC_Muon_clct_pattern_low | (bits.MPC_Muon_clct_pattern_bit5 << 4); // Run3-b CLCT pattern is gone
 
   unsigned run2_pattern = run2_pattern_lookup_tbl[bits.MPC_Muon0_clct_LR][slope];
-  unsigned run3_pattern = 0; // Run3-b CLCT pattern is gone
-  unsigned run3b_slope = (slope << 2) | bits.MPC_Muon0_clct_bend_run3b_extra; // Run3b 6-bits slope 
+  unsigned run3_pattern = 0;                                                   // Run3-b CLCT pattern is gone
+  unsigned run3b_slope = (slope << 2) | bits.MPC_Muon0_clct_bend_run3b_extra;  // Run3b 6-bits slope
   // unsigned run3b_slope = slope;
 
   CSCCorrelatedLCTDigi digi(1,
@@ -135,15 +138,15 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020_GEM_Run3b::CorrelatedLCTDigis
                             run3_pattern,
                             run3b_slope);
   digi.setHMT(hmt);
-  digi.setGemLayerUsedForSlopeComputation(bits.MPC_Muon0_GEM_layer); // Run3-b ME11 with GE11 GEM layer information
+  digi.setGemLayerUsedForSlopeComputation(bits.MPC_Muon0_GEM_layer);  // Run3-b ME11 with GE11 GEM layer information
   // digi.setRun3bSlopeExtraBits(bits.MPC_Muon0_clct_bend_run3b_extra); // Run3-b extra bits for more precise slope/bend
   result.push_back(digi);
   /// for the first MPC word:
   strip = bits.MPC_Muon1_clct_key_halfstrip;  //this goes from 0-223
   slope = (bits.MPC_Muon1_clct_bend_low & 0x7) | (bits.MPC_Muon1_clct_bend_high << 3);
   run2_pattern = run2_pattern_lookup_tbl[bits.MPC_Muon1_clct_LR][slope];
-  run3_pattern = 0; // Run3-b CLCT pattern is gone
-  run3b_slope = (slope << 2) | bits.MPC_Muon1_clct_bend_run3b_extra; // Run3b 6-bits slope 
+  run3_pattern = 0;                                                   // Run3-b CLCT pattern is gone
+  run3b_slope = (slope << 2) | bits.MPC_Muon1_clct_bend_run3b_extra;  // Run3b 6-bits slope
   // run3b_slope = slope;
 
   digi = CSCCorrelatedLCTDigi(2,
@@ -164,7 +167,7 @@ std::vector<CSCCorrelatedLCTDigi> CSCTMBHeader2020_GEM_Run3b::CorrelatedLCTDigis
                               run3_pattern,
                               run3b_slope);
   digi.setHMT(hmt);
-  digi.setGemLayerUsedForSlopeComputation(bits.MPC_Muon1_GEM_layer); // Run3-b ME11 with GE11 GEM layer information
+  digi.setGemLayerUsedForSlopeComputation(bits.MPC_Muon1_GEM_layer);  // Run3-b ME11 with GE11 GEM layer information
   // digi.setRun3bSlopeExtraBits(bits.MPC_Muon1_clct_bend_run3b_extra); // Run3-b extra bits for more precise slope/bend
   result.push_back(digi);
   return result;
@@ -265,13 +268,13 @@ void CSCTMBHeader2020_GEM_Run3b::addCorrelatedLCT0(const CSCCorrelatedLCTDigi& d
   bits.MPC_Muon0_lct_quality = digi.getQuality() & 0x7;
 
   // Run3-b 6-bits slope/bend
-  bits.MPC_Muon0_clct_bend_low = (digi.getSlopeEx() >> 2 ) & 0x7;
+  bits.MPC_Muon0_clct_bend_low = (digi.getSlopeEx() >> 2) & 0x7;
   bits.MPC_Muon0_clct_bend_high = (digi.getSlopeEx() >> 5) & 0x1;
   bits.MPC_Muon0_clct_bend_run3b_extra = digi.getSlopeEx() & 0x3;
   bits.MPC_Muon0_clct_LR = digi.getBend() & 0x1;
   bits.MPC_Muon_HMT_bit0 = digi.getHMT() & 0x1;
-  bits.MPC_Muon_HMT_high = (digi.getHMT() >> 1) & 0x3; // Run3-b MPC-LCT HMT is 3-bits
-  bits.MPC_Muon0_GEM_layer = digi.getGemLayerUsedForSlopeComputation(); // Run3-b ME11 with GE11 GEM layer information
+  bits.MPC_Muon_HMT_high = (digi.getHMT() >> 1) & 0x3;                   // Run3-b MPC-LCT HMT is 3-bits
+  bits.MPC_Muon0_GEM_layer = digi.getGemLayerUsedForSlopeComputation();  // Run3-b ME11 with GE11 GEM layer information
   bits.MPC_Muon_alct_bxn = digi.getBX();
   bits.MPC_Muon0_clct_bx0 = digi.getBX0();
 }
@@ -283,15 +286,15 @@ void CSCTMBHeader2020_GEM_Run3b::addCorrelatedLCT1(const CSCCorrelatedLCTDigi& d
   bits.MPC_Muon1_clct_QuarterStrip = digi.getQuartStripBit() & 0x1;
   bits.MPC_Muon1_clct_EighthStrip = digi.getEighthStripBit() & 0x1;
   bits.MPC_Muon1_lct_quality = digi.getQuality() & 0x7;
-  
+
   // Run3-b 6-bits slope/bend
-  bits.MPC_Muon1_clct_bend_low = (digi.getSlopeEx() >>2) & 0x7;
+  bits.MPC_Muon1_clct_bend_low = (digi.getSlopeEx() >> 2) & 0x7;
   bits.MPC_Muon1_clct_bend_high = (digi.getSlopeEx() >> 5) & 0x1;
   bits.MPC_Muon1_clct_bend_run3b_extra = digi.getSlopeEx() & 0x3;
   bits.MPC_Muon1_clct_LR = digi.getBend() & 0x1;
   bits.MPC_Muon_HMT_bit0 = digi.getHMT() & 0x1;
-  bits.MPC_Muon_HMT_high = (digi.getHMT() >> 1) & 0x3; // Run3-b MPC-LCT HMT is 3-bits
-  bits.MPC_Muon1_GEM_layer = digi.getGemLayerUsedForSlopeComputation(); // Run3-b ME11 with GE11 GEM layer information
+  bits.MPC_Muon_HMT_high = (digi.getHMT() >> 1) & 0x3;                   // Run3-b MPC-LCT HMT is 3-bits
+  bits.MPC_Muon1_GEM_layer = digi.getGemLayerUsedForSlopeComputation();  // Run3-b ME11 with GE11 GEM layer information
   bits.MPC_Muon_alct_bxn = digi.getBX();
   bits.MPC_Muon1_clct_bx0 = digi.getBX0();
 }
@@ -386,8 +389,9 @@ void CSCTMBHeader2020_GEM_Run3b::print(std::ostream& os) const {
      << " key halfstrip = " << bits.MPC_Muon0_clct_key_halfstrip
      << " 1/4strip flag = " << bits.MPC_Muon0_clct_QuarterStrip
      << " 1/8strip flag = " << bits.MPC_Muon0_clct_EighthStrip << "\n"
-     << " quality = " << bits.MPC_Muon0_lct_quality
-     << " 6bits slope/bend = " << ((bits.MPC_Muon0_clct_bend_run3b_extra & 0x3) | ((bits.MPC_Muon0_clct_bend_low & 0x7) << 2) | (bits.MPC_Muon0_clct_bend_high << 5))
+     << " quality = " << bits.MPC_Muon0_lct_quality << " 6bits slope/bend = "
+     << ((bits.MPC_Muon0_clct_bend_run3b_extra & 0x3) | ((bits.MPC_Muon0_clct_bend_low & 0x7) << 2) |
+         (bits.MPC_Muon0_clct_bend_high << 5))
      << " (extra bend bits = " << bits.MPC_Muon0_clct_bend_run3b_extra << ")"
      << " L/R bend = " << bits.MPC_Muon0_clct_LR << " LCT0_GEM layer = " << bits.MPC_Muon0_GEM_layer << "\n";
 
@@ -395,8 +399,9 @@ void CSCTMBHeader2020_GEM_Run3b::print(std::ostream& os) const {
      << " key halfstrip = " << bits.MPC_Muon1_clct_key_halfstrip
      << " 1/4strip flag = " << bits.MPC_Muon1_clct_QuarterStrip
      << " 1/8strip flag = " << bits.MPC_Muon1_clct_EighthStrip << "\n"
-     << " quality = " << bits.MPC_Muon1_lct_quality
-     << " 6bits slope/bend = " << ((bits.MPC_Muon1_clct_bend_run3b_extra & 0x3) | ((bits.MPC_Muon1_clct_bend_low & 0x7) << 2) | (bits.MPC_Muon1_clct_bend_high << 5))
+     << " quality = " << bits.MPC_Muon1_lct_quality << " 6bits slope/bend = "
+     << ((bits.MPC_Muon1_clct_bend_run3b_extra & 0x3) | ((bits.MPC_Muon1_clct_bend_low & 0x7) << 2) |
+         (bits.MPC_Muon1_clct_bend_high << 5))
      << " (extra bend bits = " << bits.MPC_Muon1_clct_bend_run3b_extra << ")"
      << " L/R bend = " << bits.MPC_Muon1_clct_LR << " LCT1_GEM layer = " << bits.MPC_Muon1_GEM_layer << "\n";
 

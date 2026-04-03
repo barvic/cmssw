@@ -54,7 +54,8 @@ struct CSCTMBHeader2020_GEM_Run3b : public CSCVTMBHeaderFormat {
     return ((bits.num_copad & 0xF) + ((bits.gem_delay & 0xF) << 4) + ((bits.gem_clct_win & 0xF) << 8) +
             ((bits.alct_gem_win & 0x7) << 12));
   }
-  uint16_t run3_CLCT_patternID() const override { // Run3-b MPC-LCT format for ME11s with GEMs does not use Run3 CLCT pattern IDs
+  uint16_t run3_CLCT_patternID()
+      const override {  // Run3-b MPC-LCT format for ME11s with GEMs does not use Run3 CLCT pattern IDs
     return 0;
   }
   // ==
@@ -141,8 +142,8 @@ struct CSCTMBHeader2020_GEM_Run3b : public CSCVTMBHeaderFormat {
         hs_layer_trig : 1, flag29 : 1;
     unsigned hmt_nhits_bits_high : 5, alct_ecc_err : 2, cfeb_badbits_found : 5, cfeb_badbits_blocked : 1, alctCfg : 1,
         bx0_match : 1, flag30 : 1;
-    unsigned MPC_Muon0_alct_key_wire : 7, MPC_Muon0_clct_bend_run3b_extra : 2, MPC_Muon1_clct_bend_run3b_extra : 2, MPC_Muon0_lct_quality : 3,
-        MPC_Muon0_clct_QuarterStrip : 1, flag31 : 1;
+    unsigned MPC_Muon0_alct_key_wire : 7, MPC_Muon0_clct_bend_run3b_extra : 2, MPC_Muon1_clct_bend_run3b_extra : 2,
+        MPC_Muon0_lct_quality : 3, MPC_Muon0_clct_QuarterStrip : 1, flag31 : 1;
     // 32
     unsigned MPC_Muon0_clct_key_halfstrip : 8, MPC_Muon0_clct_LR : 1, MPC_Muon0_clct_EighthStrip : 1,
         MPC_Muon_alct_bxn : 1, MPC_Muon0_clct_bx0 : 1, MPC_Muon0_clct_bend_low : 3, flag32 : 1;
